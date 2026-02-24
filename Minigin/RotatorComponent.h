@@ -6,10 +6,10 @@
 
 namespace dae
 {
-	class OrbitComponent final : public Component
+	class RotatorComponent final : public Component
 	{
 	public:
-		explicit OrbitComponent(GameObject* pOwner,
+		explicit RotatorComponent(GameObject* pOwner,
 			float radius = 100.f,
 			float speed = 1.f,
 			float startAngle = 0.f)

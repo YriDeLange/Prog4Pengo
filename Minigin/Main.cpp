@@ -16,7 +16,7 @@
 #include "RenderComponent.h"
 #include "TextComponent.h"
 #include "FPSComponent.h"
-#include "OrbitComponent.h"
+#include "RotatorComponent.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -76,7 +76,7 @@ static void load()
 		auto pengoObj = std::make_unique<dae::GameObject>();
 		auto* render1 = pengoObj->AddComponent<dae::RenderComponent>();
 		render1->SetTexture("pengo.png");
-		pengoObj->AddComponent<dae::OrbitComponent>(10.f, -15.f, 0.f);
+		pengoObj->AddComponent<dae::RotatorComponent>(10.f, -15.f, 0.f);
 		dae::GameObject* pengo = pengoObj.get();
 		pengo->SetParent(pivot, false);
 		pengoObj.release();
@@ -84,7 +84,7 @@ static void load()
 		auto enemyObj = std::make_unique<dae::GameObject>();
 		auto* render2 = enemyObj->AddComponent<dae::RenderComponent>();
 		render2->SetTexture("sno-bee.png");
-		enemyObj->AddComponent<dae::OrbitComponent>(60.f, 6.f, 0.f);
+		enemyObj->AddComponent<dae::RotatorComponent>(60.f, 6.f, 0.f);
 		dae::GameObject* enemy = enemyObj.get();
 		enemy->SetParent(pengo, false);
 		enemyObj.release();
