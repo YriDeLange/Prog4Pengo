@@ -9,7 +9,7 @@ dae::FPSComponent::FPSComponent(GameObject* pOwner)
 {
 }
 
-void dae::FPSComponent::Update()
+void dae::FPSComponent::Update(float /*deltaTime*/)
 {
 	const float dt = GameTime::GetInstance().GetDeltaTime();
 

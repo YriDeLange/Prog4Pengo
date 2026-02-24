@@ -12,7 +12,8 @@ namespace dae
 	class GameObject final
 	{
 	public:
-		void Update();
+		void FixedUpdate();
+		void Update(float deltaTime);
 		void Render() const;
 
 		// Add a component (constructed with this GameObject as owner)

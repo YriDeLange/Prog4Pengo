@@ -101,8 +101,20 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 void dae::Minigin::RunOneFrame()
 {
-	GameTime::GetInstance().Update();
+	auto& time = GameTime::GetInstance();
+	time.Update();
+
 	m_quit = !InputManager::GetInstance().ProcessInput();
-	SceneManager::GetInstance().Update();
+
+	// Fixed update: catch up in fixed steps (physics / networking)
+	while (time.ShouldFixedUpdate())
+	{
+		SceneManager::GetInstance().FixedUpdate();
+		time.ConsumeFixedStep();
+	}
+
+	// Variable update: pass actual frame delta time
+	SceneManager::GetInstance().Update(time.GetDeltaTime());
+
 	Renderer::GetInstance().Render();
 }

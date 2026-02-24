@@ -9,7 +9,7 @@ namespace dae
 	{
 	public:
 		explicit FPSComponent(GameObject* pOwner);
-		void Update() override;
+		void Update(float deltaTime) override;
 
 	private:
 		float m_accumulatedTime{ 0.f };

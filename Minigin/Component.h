@@ -7,7 +7,8 @@ namespace dae
 	class Component
 	{
 	public:
-		virtual void Update() {}
+		virtual void FixedUpdate() {}
+		virtual void Update(float /*deltaTime*/) {}
 		virtual void Render() const {}
 
 		// Components cannot exist without a GameObject
