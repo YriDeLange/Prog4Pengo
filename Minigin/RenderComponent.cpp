@@ -1,5 +1,4 @@
 #include "RenderComponent.h"
-#include "TransformComponent.h"
 #include "GameObject.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
@@ -14,15 +13,8 @@ void dae::RenderComponent::Render() const
 {
 	if (!m_texture) return;
 
-	auto* transform = GetOwner()->GetComponent<TransformComponent>();
-	float x = 0.f, y = 0.f;
-	if (transform)
-	{
-		const auto& pos = transform->GetPosition();
-		x = pos.x;
-		y = pos.y;
-	}
-	Renderer::GetInstance().RenderTexture(*m_texture, x, y);
+	const auto& pos = GetOwner()->GetWorldPosition();
+	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
 }
 
 void dae::RenderComponent::SetTexture(const std::string& filename)

@@ -16,6 +16,7 @@
 #include "RenderComponent.h"
 #include "TextComponent.h"
 #include "FPSComponent.h"
+#include "OrbitComponent.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -28,7 +29,6 @@ static void load()
 	// --- Background ---
 	{
 		auto go = std::make_unique<dae::GameObject>();
-		go->AddComponent<dae::TransformComponent>();
 		auto* render = go->AddComponent<dae::RenderComponent>();
 		render->SetTexture("background.png");
 		scene.Add(std::move(go));
@@ -37,8 +37,7 @@ static void load()
 	// --- Logo ---
 	{
 		auto go = std::make_unique<dae::GameObject>();
-		auto* t = go->AddComponent<dae::TransformComponent>();
-		t->SetPosition(358.f, 180.f);
+		go->SetLocalPosition(358.f, 180.f);
 		auto* render = go->AddComponent<dae::RenderComponent>();
 		render->SetTexture("logo.png");
 		scene.Add(std::move(go));
@@ -48,8 +47,7 @@ static void load()
 	{
 		auto font = rm.LoadFont("Lingua.otf", 36);
 		auto go = std::make_unique<dae::GameObject>();
-		auto* t = go->AddComponent<dae::TransformComponent>();
-		t->SetPosition(292.f, 20.f);
+		go->SetLocalPosition(292.f, 20.f);
 		go->AddComponent<dae::RenderComponent>();
 		auto* text = go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
 		text->SetColor({ 255, 255, 0, 255 });
@@ -60,13 +58,36 @@ static void load()
 	{
 		auto font = rm.LoadFont("Lingua.otf", 20);
 		auto go = std::make_unique<dae::GameObject>();
-		auto* t = go->AddComponent<dae::TransformComponent>();
-		t->SetPosition(5.f, 5.f);
+		go->SetLocalPosition(5.f, 5.f);
 		go->AddComponent<dae::RenderComponent>();
 		auto* text = go->AddComponent<dae::TextComponent>("0.0 FPS", font);
 		text->SetColor({ 255, 255, 255, 255 });
 		go->AddComponent<dae::FPSComponent>();
 		scene.Add(std::move(go));
+	}
+
+	// --- SCENEGRAPH DEMO ---
+	{
+		auto pivotObj = std::make_unique<dae::GameObject>();
+		pivotObj->SetLocalPosition(320.f, 360.f);
+		dae::GameObject* pivot = pivotObj.get();
+		scene.Add(std::move(pivotObj));
+
+		auto pengoObj = std::make_unique<dae::GameObject>();
+		auto* render1 = pengoObj->AddComponent<dae::RenderComponent>();
+		render1->SetTexture("pengo.png");
+		pengoObj->AddComponent<dae::OrbitComponent>(10.f, -15.f, 0.f);
+		dae::GameObject* pengo = pengoObj.get();
+		pengo->SetParent(pivot, false);
+		pengoObj.release();
+
+		auto enemyObj = std::make_unique<dae::GameObject>();
+		auto* render2 = enemyObj->AddComponent<dae::RenderComponent>();
+		render2->SetTexture("sno-bee.png");
+		enemyObj->AddComponent<dae::OrbitComponent>(60.f, 6.f, 0.f);
+		dae::GameObject* enemy = enemyObj.get();
+		enemy->SetParent(pengo, false);
+		enemyObj.release();
 	}
 }
 

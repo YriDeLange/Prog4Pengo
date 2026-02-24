@@ -4,7 +4,9 @@
 #include <typeindex>
 #include <stdexcept>
 #include <cassert>
+#include <algorithm>
 #include "Component.h" 
+#include <glm/glm.hpp>
 
 namespace dae
 {
@@ -58,14 +60,41 @@ namespace dae
 			return GetComponent<T>() != nullptr;
 		}
 
+		void SetParent(GameObject* parent, bool keepWorldPosition = true);
+
+		GameObject* GetParent()               const { return m_parent; }
+		size_t      GetChildCount()           const { return m_children.size(); }
+		GameObject* GetChildAt(size_t index)  const { return m_children[index].get(); }
+
+		void SetLocalPosition(float x, float y, float z = 0.f);
+		void SetLocalPosition(const glm::vec3& pos);
+
+		const glm::vec3& GetLocalPosition() const { return m_localPosition; }
+		const glm::vec3& GetWorldPosition();
+
 		GameObject() = default;
-		~GameObject() = default;
+		~GameObject();
 		GameObject(const GameObject&) = delete;
 		GameObject(GameObject&&) = delete;
 		GameObject& operator=(const GameObject&) = delete;
 		GameObject& operator=(GameObject&&) = delete;
 
 	private:
+		void AddChild(GameObject* child);
+		void RemoveChild(GameObject* child);
+		bool IsChildOf(const GameObject* potentialParent) const;
+
+		void SetPositionDirty();
+		void UpdateWorldPosition();
+
 		std::vector<std::unique_ptr<Component>> m_components{};
+
+		GameObject* m_parent{ nullptr };
+		std::vector<std::unique_ptr<GameObject>> m_children{};
+
+		glm::vec3  m_localPosition{ 0.f, 0.f, 0.f };
+		glm::vec3  m_worldPosition{ 0.f, 0.f, 0.f };
+		bool       m_positionIsDirty{ true };
+
 	};
 }
