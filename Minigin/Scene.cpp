@@ -18,14 +18,20 @@ void Scene::RemoveAll()
 void Scene::FixedUpdate()
 {
     for (auto& object : m_objects)
-        object->FixedUpdate();
+    {
+        if (object->GetParent() == nullptr)
+            object->FixedUpdate();
+    }
+    CleanupMarked();
 }
 
 void Scene::Update(float deltaTime)
 {
     for (auto& object : m_objects)
-        object->Update(deltaTime);
-
+    {
+        if (object->GetParent() == nullptr)
+            object->Update(deltaTime);
+    }
     CleanupMarked();
 }
 
@@ -43,9 +49,10 @@ void Scene::CleanupMarked()
 
 void Scene::Render() const
 {
-	for (const auto& object : m_objects)
-	{
-		object->Render();
-	}
+    for (const auto& object : m_objects)
+    {
+        if (object->GetParent() == nullptr)
+            object->Render();
+    }
 }
 

@@ -67,7 +67,7 @@ namespace dae
 
 		GameObject* GetParent()               const { return m_parent; }
 		size_t      GetChildCount()           const { return m_children.size(); }
-		GameObject* GetChildAt(size_t index)  const { return m_children[index].get(); }
+		GameObject* GetChildAt(size_t index)  const { return m_children[index]; }
 
 		void SetLocalPosition(float x, float y, float z = 0.f);
 		void SetLocalPosition(const glm::vec3& pos);
@@ -95,7 +95,7 @@ namespace dae
 		std::vector<std::unique_ptr<Component>> m_components{};
 
 		GameObject* m_parent{ nullptr };
-		std::vector<std::unique_ptr<GameObject>> m_children{};
+		std::vector<GameObject*> m_children{};
 
 		glm::vec3  m_localPosition{ 0.f, 0.f, 0.f };
 		glm::vec3  m_worldPosition{ 0.f, 0.f, 0.f };

@@ -6,7 +6,15 @@ namespace dae
 	GameObject::~GameObject()
 	{
 		if (m_parent)
+		{
 			m_parent->RemoveChild(this);
+			m_parent = nullptr;
+		}
+
+		for (auto* child : m_children)
+		{
+			child->m_parent = nullptr;
+		}
 	}
 
 	void GameObject::FixedUpdate()
@@ -71,11 +79,10 @@ namespace dae
 	void GameObject::RemoveChild(GameObject* child)
 	{
 		auto it = std::find_if(m_children.begin(), m_children.end(),
-			[child](const std::unique_ptr<GameObject>& c) { return c.get() == child; });
+			[child](const GameObject* c) { return c == child; });
 
 		if (it == m_children.end()) return;
 
-		it->release();
 		m_children.erase(it);
 	}
 

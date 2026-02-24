@@ -79,7 +79,7 @@ static void load()
 		pengoObj->AddComponent<dae::RotatorComponent>(10.f, -15.f, 0.f);
 		dae::GameObject* pengo = pengoObj.get();
 		pengo->SetParent(pivot, false);
-		pengoObj.release();
+		scene.Add(std::move(pengoObj));
 
 		auto enemyObj = std::make_unique<dae::GameObject>();
 		auto* render2 = enemyObj->AddComponent<dae::RenderComponent>();
@@ -87,7 +87,7 @@ static void load()
 		enemyObj->AddComponent<dae::RotatorComponent>(60.f, 6.f, 0.f);
 		dae::GameObject* enemy = enemyObj.get();
 		enemy->SetParent(pengo, false);
-		enemyObj.release();
+		scene.Add(std::move(enemyObj));
 	}
 }
 
