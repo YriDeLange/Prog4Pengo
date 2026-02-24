@@ -60,6 +60,9 @@ namespace dae
 			return GetComponent<T>() != nullptr;
 		}
 
+		void MarkForDelete() { m_markedForDelete = true; }
+		bool IsMarkedForDelete() const { return m_markedForDelete; }
+
 		void SetParent(GameObject* parent, bool keepWorldPosition = true);
 
 		GameObject* GetParent()               const { return m_parent; }
@@ -80,6 +83,8 @@ namespace dae
 		GameObject& operator=(GameObject&&) = delete;
 
 	private:
+		bool m_markedForDelete{ false };
+
 		void AddChild(GameObject* child);
 		void RemoveChild(GameObject* child);
 		bool IsChildOf(const GameObject* potentialParent) const;
