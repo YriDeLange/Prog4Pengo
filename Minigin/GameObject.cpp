@@ -44,6 +44,14 @@ namespace dae
 			child->Render();
 	}
 
+	void GameObject::RenderUI() const
+	{
+		for (const auto& component : m_components)
+			component->RenderUI();
+		for (const auto& child : m_children)
+			child->RenderUI();
+	}
+
 	void GameObject::SetParent(GameObject* newParent, bool keepWorldPosition)
 	{
 		if (newParent == this)       return;

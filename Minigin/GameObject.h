@@ -17,6 +17,7 @@ namespace dae
 		void FixedUpdate();
 		void Update(float deltaTime);
 		void Render() const;
+		void RenderUI() const;
 
 		// Add a component (constructed with this GameObject as owner)
 		template<typename T, typename... Args>

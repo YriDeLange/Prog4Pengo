@@ -1,4 +1,5 @@
 ﻿#include <imgui.h>
+#include <implot.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
 #include <stdexcept>
@@ -27,6 +28,7 @@ void dae::Renderer::Init(SDL_Window* window)
 	}
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -46,7 +48,7 @@ void dae::Renderer::Render() const
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::ShowDemoWindow(); // For demonstration purposes, do not keep this in your engine
+	SceneManager::GetInstance().RenderUI();
 
 	ImGui::Render();
 
@@ -64,6 +66,7 @@ void dae::Renderer::Destroy()
 {
 	ImGui_ImplSDLRenderer3_Shutdown();
 	ImGui_ImplSDL3_Shutdown();
+	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 
 	if (m_renderer != nullptr)

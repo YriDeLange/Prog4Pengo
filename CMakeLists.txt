@@ -29,6 +29,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/TextComponent.cpp
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
+  Minigin/CacheComponent.cpp
 )
 
 # enable c++20 features
@@ -171,6 +172,7 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   SDL3::SDL3
   SDL3_ttf::SDL3_ttf
   imgui
+  implot
   ${VLD_LIBRARIES}
 )
 

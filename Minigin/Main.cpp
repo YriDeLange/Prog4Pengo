@@ -17,6 +17,7 @@
 #include "TextComponent.h"
 #include "FPSComponent.h"
 #include "RotatorComponent.h"
+#include "CacheComponent.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -68,7 +69,7 @@ static void load()
 
 	// --- SCENEGRAPH DEMO ---
 	{
-		auto pivotObj = std::make_unique<dae::GameObject>();
+		/*auto pivotObj = std::make_unique<dae::GameObject>();
 		pivotObj->SetLocalPosition(320.f, 360.f);
 		dae::GameObject* pivot = pivotObj.get();
 		scene.Add(std::move(pivotObj));
@@ -87,7 +88,14 @@ static void load()
 		enemyObj->AddComponent<dae::RotatorComponent>(60.f, 6.f, 0.f);
 		dae::GameObject* enemy = enemyObj.get();
 		enemy->SetParent(pengo, false);
-		scene.Add(std::move(enemyObj));
+		scene.Add(std::move(enemyObj));*/
+	}
+
+	// --- TRASH THE CACHE ---
+	{
+		auto go = std::make_unique<dae::GameObject>();
+		go->AddComponent<dae::CacheComponent>();
+		scene.Add(std::move(go));
 	}
 }
 

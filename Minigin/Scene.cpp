@@ -56,3 +56,12 @@ void Scene::Render() const
     }
 }
 
+void dae::Scene::RenderUI() const
+{
+    for (const auto& object : m_objects)
+    {
+        if (object->GetParent() == nullptr)
+            object->RenderUI();
+	}
+}
+

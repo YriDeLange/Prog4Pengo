@@ -10,6 +10,7 @@ namespace dae
 		virtual void FixedUpdate() {}
 		virtual void Update(float /*deltaTime*/) {}
 		virtual void Render() const {}
+		virtual void RenderUI() const {}
 
 		// Components cannot exist without a GameObject
 		GameObject* GetOwner() const { return m_pOwner; }
