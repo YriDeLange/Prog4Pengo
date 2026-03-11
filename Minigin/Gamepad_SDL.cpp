@@ -23,7 +23,11 @@ class dae::Gamepad::GamepadImpl
 public:
     void Open(unsigned int index)
     {
-        m_pGamepad = SDL_OpenGamepad(index);
+        int count{};
+        SDL_JoystickID* gamepads = SDL_GetGamepads(&count);
+        if (gamepads && static_cast<int>(index) < count)
+            m_pGamepad = SDL_OpenGamepad(gamepads[index]);
+        SDL_free(gamepads);
     }
 
     void Update(unsigned int /*index*/)
