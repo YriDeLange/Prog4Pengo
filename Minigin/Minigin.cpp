@@ -104,7 +104,7 @@ void dae::Minigin::RunOneFrame()
 	auto& time = GameTime::GetInstance();
 	time.Update();
 
-	m_quit = !InputManager::GetInstance().ProcessInput();
+	m_quit = !InputManager::GetInstance().ProcessInput(time.GetDeltaTime());
 
 	// Fixed update: catch up in fixed steps (physics / networking)
 	while (time.ShouldFixedUpdate())

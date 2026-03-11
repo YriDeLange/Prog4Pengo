@@ -9,6 +9,8 @@
 #include "SceneManager.h"
 #include "ResourceManager.h"
 #include "Scene.h"
+#include "InputManager.h"
+#include "MoveCommand.h"
 
 // Components
 #include "GameObject.h"
@@ -92,10 +94,62 @@ static void load()
 	}
 
 	// --- TRASH THE CACHE ---
-	{
+	/*{
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::CacheComponent>();
 		scene.Add(std::move(go));
+	}*/
+
+	// --- COMMANDS ---
+	{
+		auto font = rm.LoadFont("Lingua.otf", 12);
+		auto go = std::make_unique<dae::GameObject>();
+		go->SetLocalPosition(5.f, 40.f);
+		go->AddComponent<dae::RenderComponent>();
+		auto* text = go->AddComponent<dae::TextComponent>("Use WASD to move Pengo", font);
+		text->SetColor({ 255, 255, 0, 255 });
+		scene.Add(std::move(go));
+
+		auto go2 = std::make_unique<dae::GameObject>();
+		go2->SetLocalPosition(5.f, 60.f);
+		go2->AddComponent<dae::RenderComponent>();
+		auto* text2 = go2->AddComponent<dae::TextComponent>("Use the D-Pad to move Sno-bee", font);
+		text2->SetColor({ 255, 255, 0, 255 });
+		scene.Add(std::move(go2));
+
+		auto pPlayer1Obj = std::make_unique<dae::GameObject>();
+		pPlayer1Obj->SetLocalPosition(100.f, 300.f);
+		pPlayer1Obj->AddComponent<dae::RenderComponent>()->SetTexture("pengo.png");
+		dae::GameObject* pPlayer1 = pPlayer1Obj.get();
+		scene.Add(std::move(pPlayer1Obj));
+
+		auto pPlayer2Obj = std::make_unique<dae::GameObject>();
+		pPlayer2Obj->SetLocalPosition(200.f, 300.f);
+		pPlayer2Obj->AddComponent<dae::RenderComponent>()->SetTexture("sno-bee.png");
+		dae::GameObject* pPlayer2 = pPlayer2Obj.get();
+		scene.Add(std::move(pPlayer2Obj));
+
+		auto& input = dae::InputManager::GetInstance();
+		float speedP1 = 100.f;
+		float speedP2 = 200.f;
+
+		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, speedP1));
+		input.BindKeyboardCommand(SDL_SCANCODE_S, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0,  1 }, speedP1));
+		input.BindKeyboardCommand(SDL_SCANCODE_A, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ -1, 0 }, speedP1));
+		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, speedP1));
+
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0, -1 }, speedP2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0,  1 }, speedP2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadLeft, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ -1, 0 }, speedP2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, speedP2));
 	}
 }
 

@@ -30,6 +30,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
   Minigin/CacheComponent.cpp
+  Minigin/Gamepad.cpp
 )
 
 # enable c++20 features
@@ -175,6 +176,10 @@ target_link_libraries("${TARGET_NAME}" PUBLIC
   implot
   ${VLD_LIBRARIES}
 )
+
+if(WIN32)
+  target_link_libraries("${TARGET_NAME}" PUBLIC xinput)
+endif()
 
 if(MSVC)
   # compile at warning level 4 + treat warnings as errors
