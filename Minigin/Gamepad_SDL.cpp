@@ -1,26 +1,24 @@
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <XInput.h>
-
 #include "Gamepad.h"
+#include <SDL3/SDL.h>
 
 class dae::Gamepad::GamepadImpl
 {
-    XINPUT_STATE m_PreviousState{};
-    XINPUT_STATE m_CurrentState{};
-    WORD m_ButtonsPressedThisFrame{};
-    WORD m_ButtonsReleasedThisFrame{};
+    SDL_Gamepad* m_pGamepad{ nullptr };
+    bool m_CurrentButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
+    bool m_PreviousButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
 
 public:
-    void Update(unsigned int controllerIndex)
+    void Open(unsigned int index)
     {
-        CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
-        ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
-        XInputGetState(controllerIndex, &m_CurrentState);
+        m_pGamepad = SDL_OpenGamepad(index);
+    }
 
-        auto buttonChanges = m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons;
-        m_ButtonsPressedThisFrame = buttonChanges & m_CurrentState.Gamepad.wButtons;
-        m_ButtonsReleasedThisFrame = buttonChanges & (~m_CurrentState.Gamepad.wButtons);
+    void Update()
+    {
+        memcpy(m_PreviousButtons, m_CurrentButtons, sizeof(m_CurrentButtons));
+        for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i)
+            m_CurrentButtons[i] = SDL_GetGamepadButton(m_pGamepad,
+                static_cast<SDL_GamepadButton>(i));
     }
 
     bool IsDownThisFrame(unsigned int button) const
@@ -62,3 +60,4 @@ bool dae::Gamepad::IsPressed(Button b) const
 {
     return m_pImpl->IsPressed(static_cast<unsigned int>(b));
 }
+};

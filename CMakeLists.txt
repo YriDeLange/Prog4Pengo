@@ -30,8 +30,13 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
   Minigin/CacheComponent.cpp
-  Minigin/Gamepad.cpp
 )
+
+if(EMSCRIPTEN)
+  target_sources(${TARGET_NAME} PRIVATE Minigin/Gamepad_SDL.cpp)
+else()
+  target_sources(${TARGET_NAME} PRIVATE Minigin/Gamepad.cpp)
+endif()
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
