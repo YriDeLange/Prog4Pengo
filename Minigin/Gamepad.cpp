@@ -1,8 +1,12 @@
+#ifndef __EMSCRIPTEN__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <XInput.h>
+#endif
 
 #include "Gamepad.h"
+
+#ifndef __EMSCRIPTEN__
 
 class dae::Gamepad::GamepadImpl
 {
@@ -38,6 +42,18 @@ public:
         return m_CurrentState.Gamepad.wButtons & button;
     }
 };
+
+#else
+class dae::Gamepad::GamepadImpl
+{
+public:
+    void Update(unsigned int) {}
+    bool IsDownThisFrame(unsigned int) const { return false; }
+    bool IsUpThisFrame(unsigned int) const { return false; }
+    bool IsPressed(unsigned int) const { return false; }
+};
+
+#endif
 
 dae::Gamepad::Gamepad(unsigned int controllerIndex)
     : m_ControllerIndex(controllerIndex)
