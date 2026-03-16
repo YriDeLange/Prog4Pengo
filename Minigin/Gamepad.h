@@ -20,7 +20,6 @@ namespace dae
         bool IsDownThisFrame(Button button) const;
         bool IsUpThisFrame(Button button) const;
         bool IsPressed(Button button) const;
-        void OnGamepadAdded();
 
     private:
         class GamepadImpl;

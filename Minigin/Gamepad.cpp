@@ -67,5 +67,3 @@ bool dae::Gamepad::IsPressed(Button b) const
 {
     return m_pImpl->IsPressed(static_cast<unsigned int>(b));
 }
-
-void dae::Gamepad::OnGamepadAdded() {}
