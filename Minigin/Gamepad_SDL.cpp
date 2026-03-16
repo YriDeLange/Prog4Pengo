@@ -37,6 +37,9 @@ public:
 
     void Update()
     {
+        if (!m_pGamepad)
+            Open();
+
         memcpy(m_PreviousButtons, m_CurrentButtons, sizeof(m_CurrentButtons));
         if (m_pGamepad)
         {
