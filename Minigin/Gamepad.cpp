@@ -6,17 +6,22 @@
 
 class dae::Gamepad::GamepadImpl
 {
+    unsigned int m_ControllerIndex;
     XINPUT_STATE m_PreviousState{};
     XINPUT_STATE m_CurrentState{};
     WORD m_ButtonsPressedThisFrame{};
     WORD m_ButtonsReleasedThisFrame{};
 
 public:
-    void Update(unsigned int controllerIndex)
+    explicit GamepadImpl(unsigned int controllerIndex)
+        : m_ControllerIndex(controllerIndex) {
+    }
+
+    void Update()
     {
         CopyMemory(&m_PreviousState, &m_CurrentState, sizeof(XINPUT_STATE));
         ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
-        XInputGetState(controllerIndex, &m_CurrentState);
+        XInputGetState(m_ControllerIndex, &m_CurrentState);
 
         auto buttonChanges = m_CurrentState.Gamepad.wButtons ^ m_PreviousState.Gamepad.wButtons;
         m_ButtonsPressedThisFrame = buttonChanges & m_CurrentState.Gamepad.wButtons;
@@ -40,13 +45,13 @@ public:
 };
 
 dae::Gamepad::Gamepad(unsigned int controllerIndex)
-    : m_ControllerIndex(controllerIndex)
-    , m_pImpl(new GamepadImpl{}) {
+    : m_pImpl(new GamepadImpl{ controllerIndex })
+{
 }
 
 dae::Gamepad::~Gamepad() { delete m_pImpl; }
 
-void dae::Gamepad::Update() { m_pImpl->Update(m_ControllerIndex); }
+void dae::Gamepad::Update() { m_pImpl->Update(); }
 
 bool dae::Gamepad::IsDownThisFrame(Button b) const
 {

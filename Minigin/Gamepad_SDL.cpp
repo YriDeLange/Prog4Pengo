@@ -4,6 +4,7 @@
 
 class dae::Gamepad::GamepadImpl
 {
+    unsigned int m_ControllerIndex;
     SDL_Gamepad* m_pGamepad{ nullptr };
     bool m_CurrentButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
     bool m_PreviousButtons[SDL_GAMEPAD_BUTTON_COUNT]{};
@@ -21,16 +22,20 @@ class dae::Gamepad::GamepadImpl
     }
 
 public:
-    void Open(unsigned int index)
+    explicit GamepadImpl(unsigned int controllerIndex)
+        : m_ControllerIndex(controllerIndex) {
+    }
+
+    void Open()
     {
         int count{};
         SDL_JoystickID* gamepads = SDL_GetGamepads(&count);
-        if (gamepads && static_cast<int>(index) < count)
-            m_pGamepad = SDL_OpenGamepad(gamepads[index]);
+        if (gamepads && static_cast<int>(m_ControllerIndex) < count)
+            m_pGamepad = SDL_OpenGamepad(gamepads[m_ControllerIndex]);
         SDL_free(gamepads);
     }
 
-    void Update(unsigned int /*index*/)
+    void Update()
     {
         memcpy(m_PreviousButtons, m_CurrentButtons, sizeof(m_CurrentButtons));
         if (m_pGamepad)
@@ -64,15 +69,14 @@ public:
 };
 
 dae::Gamepad::Gamepad(unsigned int controllerIndex)
-    : m_ControllerIndex(controllerIndex)
-    , m_pImpl(new GamepadImpl{})
+    : m_pImpl(new GamepadImpl{ controllerIndex })
 {
-    m_pImpl->Open(controllerIndex);
+    m_pImpl->Open();
 }
 
 dae::Gamepad::~Gamepad() { delete m_pImpl; }
 
-void dae::Gamepad::Update() { m_pImpl->Update(m_ControllerIndex); }
+void dae::Gamepad::Update() { m_pImpl->Update(); }
 
 bool dae::Gamepad::IsDownThisFrame(Button b) const
 {

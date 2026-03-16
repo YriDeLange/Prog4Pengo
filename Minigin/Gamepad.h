@@ -23,7 +23,6 @@ namespace dae
 
     private:
         class GamepadImpl;
-        unsigned int m_ControllerIndex;
         GamepadImpl* m_pImpl;
     };
 }
