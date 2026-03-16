@@ -13,6 +13,11 @@ bool dae::InputManager::ProcessInput(float deltaTime)
     while (SDL_PollEvent(&e))
     {
         if (e.type == SDL_EVENT_QUIT) return false;
+        if (e.type == SDL_EVENT_GAMEPAD_ADDED)
+        {
+            for (int i = 0; i < MAX_CONTROLLERS; ++i)
+                m_Gamepads[i].OnGamepadAdded();
+        }
         ImGui_ImplSDL3_ProcessEvent(&e);
     }
 
