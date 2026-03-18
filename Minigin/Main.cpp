@@ -221,9 +221,9 @@ static void load()
 		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, speedP1));
 
-		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Down,
+		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Pressed,
 			std::make_unique<dae::DieCommand>(pPlayer1));
-		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Down,
+		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Pressed,
 			std::make_unique<dae::AddPointsCommand>(pPlayer1, 100));
 
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Pressed,
@@ -235,9 +235,9 @@ static void load()
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, speedP2));
 
-		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Down,
+		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Pressed,
 			std::make_unique<dae::DieCommand>(pPlayer2));
-		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Down,
+		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Pressed,
 			std::make_unique<dae::AddPointsCommand>(pPlayer2, 100));
 	}
 }
