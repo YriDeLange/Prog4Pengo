@@ -85,14 +85,14 @@ static void load()
 
 	// --- FPS counter (top-left) ---
 	{
-		/*auto font = rm.LoadFont("Lingua.otf", 20);
+		auto font = rm.LoadFont("Lingua.otf", 20);
 		auto go = std::make_unique<dae::GameObject>();
-		go->SetLocalPosition(5.f, 5.f);
+		go->SetLocalPosition(100.f, 5.f);
 		go->AddComponent<dae::RenderComponent>();
 		auto* text = go->AddComponent<dae::TextComponent>("0.0 FPS", font);
 		text->SetColor({ 255, 255, 255, 255 });
 		go->AddComponent<dae::FPSComponent>();
-		scene.Add(std::move(go));*/
+		scene.Add(std::move(go));
 	}
 
 	// --- SCENEGRAPH DEMO ---
@@ -221,9 +221,9 @@ static void load()
 		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, speedP1));
 
-		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Pressed,
+		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Down,
 			std::make_unique<dae::DieCommand>(pPlayer1));
-		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Pressed,
+		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Down,
 			std::make_unique<dae::AddPointsCommand>(pPlayer1, 100));
 
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Pressed,
@@ -235,9 +235,9 @@ static void load()
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, speedP2));
 
-		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Pressed,
+		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Down,
 			std::make_unique<dae::DieCommand>(pPlayer2));
-		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Pressed,
+		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Down,
 			std::make_unique<dae::AddPointsCommand>(pPlayer2, 100));
 	}
 }
