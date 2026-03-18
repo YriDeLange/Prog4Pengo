@@ -11,6 +11,8 @@
 #include "Scene.h"
 #include "InputManager.h"
 #include "MoveCommand.h"
+#include "DieCommand.h"
+#include "AddPointsCommand.h"
 
 // Components
 #include "GameObject.h"
@@ -20,6 +22,10 @@
 #include "FPSComponent.h"
 #include "RotatorComponent.h"
 #include "CacheComponent.h"
+#include "HealthComponent.h"
+#include "LivesDisplayComponent.h"
+#include "PointsComponent.h"
+#include "PointsDisplayComponent.h"
 
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -59,14 +65,14 @@ static void load()
 
 	// --- FPS counter (top-left) ---
 	{
-		auto font = rm.LoadFont("Lingua.otf", 20);
+		/*auto font = rm.LoadFont("Lingua.otf", 20);
 		auto go = std::make_unique<dae::GameObject>();
 		go->SetLocalPosition(5.f, 5.f);
 		go->AddComponent<dae::RenderComponent>();
 		auto* text = go->AddComponent<dae::TextComponent>("0.0 FPS", font);
 		text->SetColor({ 255, 255, 255, 255 });
 		go->AddComponent<dae::FPSComponent>();
-		scene.Add(std::move(go));
+		scene.Add(std::move(go));*/
 	}
 
 	// --- SCENEGRAPH DEMO ---
@@ -123,11 +129,64 @@ static void load()
 		dae::GameObject* pPlayer1 = pPlayer1Obj.get();
 		scene.Add(std::move(pPlayer1Obj));
 
+		auto* health = pPlayer1->AddComponent<dae::HealthComponent>(3);
+		auto* points = pPlayer1->AddComponent<dae::PointsComponent>();
+
+		auto livesDisplayObj = std::make_unique<dae::GameObject>();
+		livesDisplayObj->SetLocalPosition(5.f, 5.f);
+		auto* livesDisplay = livesDisplayObj->AddComponent<dae::LivesDisplayComponent>(3, "PengoLife.png");
+		scene.Add(std::move(livesDisplayObj));
+
+		auto pointsDisplayObj = std::make_unique<dae::GameObject>();
+		pointsDisplayObj->SetLocalPosition(65.f, 5.f);
+		pointsDisplayObj->AddComponent<dae::RenderComponent>();
+		pointsDisplayObj->AddComponent<dae::TextComponent>("0", font);
+		auto* pointsDisplay = pointsDisplayObj->AddComponent<dae::PointsDisplayComponent>();
+		scene.Add(std::move(pointsDisplayObj));
+
+		health->AddObserver([livesDisplay](unsigned int eventId)
+			{
+				if (eventId == GameEvent::PlayerDied)
+					livesDisplay->OnPlayerDied();
+			});
+		points->AddObserver([pointsDisplay, points](unsigned int eventId)
+			{
+				if (eventId == GameEvent::PointsScored)
+					pointsDisplay->OnPointsScored(points->GetPoints());
+			});
+
 		auto pPlayer2Obj = std::make_unique<dae::GameObject>();
 		pPlayer2Obj->SetLocalPosition(200.f, 300.f);
 		pPlayer2Obj->AddComponent<dae::RenderComponent>()->SetTexture("sno-bee.png");
 		dae::GameObject* pPlayer2 = pPlayer2Obj.get();
 		scene.Add(std::move(pPlayer2Obj));
+
+		auto* health2 = pPlayer2->AddComponent<dae::HealthComponent>(3);
+		auto* points2 = pPlayer2->AddComponent<dae::PointsComponent>();
+
+		auto livesDisplay2Obj = std::make_unique<dae::GameObject>();
+		livesDisplay2Obj->SetLocalPosition(5.f, 25.f);
+		auto* livesDisplay2 = livesDisplay2Obj->AddComponent<dae::LivesDisplayComponent>(3, "PengoLife.png");
+		scene.Add(std::move(livesDisplay2Obj));
+
+		auto pointsDisplay2Obj = std::make_unique<dae::GameObject>();
+		pointsDisplay2Obj->SetLocalPosition(65.f, 25.f);
+		pointsDisplay2Obj->AddComponent<dae::RenderComponent>();
+		pointsDisplay2Obj->AddComponent<dae::TextComponent>("0", font);
+		auto* pointsDisplay2 = pointsDisplay2Obj->AddComponent<dae::PointsDisplayComponent>();
+		scene.Add(std::move(pointsDisplay2Obj));
+
+		health2->AddObserver([livesDisplay2](unsigned int eventId)
+			{
+				if (eventId == GameEvent::PlayerDied)
+					livesDisplay2->OnPlayerDied();
+			});
+
+		points2->AddObserver([pointsDisplay2, points2](unsigned int eventId)
+			{
+				if (eventId == GameEvent::PointsScored)
+					pointsDisplay2->OnPointsScored(points2->GetPoints());
+			});
 
 		auto& input = dae::InputManager::GetInstance();
 		float speedP1 = 100.f;
@@ -142,6 +201,11 @@ static void load()
 		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, speedP1));
 
+		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Down,
+			std::make_unique<dae::DieCommand>(pPlayer1));
+		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Down,
+			std::make_unique<dae::AddPointsCommand>(pPlayer1, 100));
+
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0, -1 }, speedP2));
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Pressed,
@@ -150,6 +214,11 @@ static void load()
 			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ -1, 0 }, speedP2));
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, speedP2));
+
+		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Down,
+			std::make_unique<dae::DieCommand>(pPlayer2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Down,
+			std::make_unique<dae::AddPointsCommand>(pPlayer2, 100));
 	}
 }
 

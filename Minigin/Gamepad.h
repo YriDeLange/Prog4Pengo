@@ -10,6 +10,8 @@ namespace dae
             DpadDown = 0x0002,
             DpadLeft = 0x0004,
             DpadRight = 0x0008,
+            A = 0x1000,
+            X = 0x4000,
         };
 
         explicit Gamepad(unsigned int controllerIndex);
