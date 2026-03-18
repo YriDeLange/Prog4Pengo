@@ -130,16 +130,16 @@ static void load()
 	{
 		auto font = rm.LoadFont("Lingua.otf", 12);
 		auto go = std::make_unique<dae::GameObject>();
-		go->SetLocalPosition(5.f, 40.f);
+		go->SetLocalPosition(5.f, 55.f);
 		go->AddComponent<dae::RenderComponent>();
-		auto* text = go->AddComponent<dae::TextComponent>("Use WASD to move Pengo", font);
+		auto* text = go->AddComponent<dae::TextComponent>("Use WASD to move Pengo, X to remove a life, C to increase score", font);
 		text->SetColor({ 255, 255, 0, 255 });
 		scene.Add(std::move(go));
 
 		auto go2 = std::make_unique<dae::GameObject>();
-		go2->SetLocalPosition(5.f, 60.f);
+		go2->SetLocalPosition(5.f, 75.f);
 		go2->AddComponent<dae::RenderComponent>();
-		auto* text2 = go2->AddComponent<dae::TextComponent>("Use the D-Pad to move Sno-bee", font);
+		auto* text2 = go2->AddComponent<dae::TextComponent>("Use the D-Pad to move Sno-bee, X to remove a life, A to increase score", font);
 		text2->SetColor({ 255, 255, 0, 255 });
 		scene.Add(std::move(go2));
 
