@@ -16,6 +16,7 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "GameTime.h"
+#include "SteamGlobals.h"
 
 #if USE_STEAMWORKS
 #pragma warning (push)
@@ -96,6 +97,11 @@ dae::Minigin::~Minigin()
 {
 	#if USE_STEAMWORKS
 		SteamAPI_Shutdown();
+		if (g_SteamAchievements)
+		{
+			delete g_SteamAchievements;
+			g_SteamAchievements = nullptr;
+		}
 	#endif
 
 	Renderer::GetInstance().Destroy();

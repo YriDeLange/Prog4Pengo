@@ -27,11 +27,31 @@
 #include "PointsComponent.h"
 #include "PointsDisplayComponent.h"
 
+#if USE_STEAMWORKS
+#include "SteamAchievements.h"
+
+enum EAchievements
+{
+	ACH_WIN_ONE_GAME = 0
+};
+
+Achievement_t g_Achievements[] =
+{
+	_ACH_ID(ACH_WIN_ONE_GAME,      "Winner")
+};
+
+CSteamAchievements* g_SteamAchievements = nullptr;
+#endif
+
 #include <filesystem>
 namespace fs = std::filesystem;
 
 static void load()
 {
+	#if USE_STEAMWORKS
+		g_SteamAchievements = new CSteamAchievements(g_Achievements, 1);
+	#endif
+
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 	auto& rm = dae::ResourceManager::GetInstance();
 

@@ -30,6 +30,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Minigin/Texture2D.cpp
   Minigin/Transform.cpp
   Minigin/CacheComponent.cpp
+  Minigin/SteamAchievements.cpp
 )
 
 if(EMSCRIPTEN)
