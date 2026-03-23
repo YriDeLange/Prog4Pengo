@@ -10,7 +10,6 @@ namespace dae
     {
         int m_Points{};
         Subject m_Subject;
-		bool m_AchievementGranted{ false };
     public:
         explicit PointsComponent(GameObject* pOwner) : Component(pOwner) {}
 
@@ -32,10 +31,10 @@ namespace dae
             m_Subject.Notify(eventId);
 
         #if USE_STEAMWORKS
-            if (!m_AchievementGranted && m_Points >= 500 && g_SteamAchievements)
+            if (!m_WinnerAchievementGranted && m_Points >= 500 && g_SteamAchievements)
             {
                 g_SteamAchievements->SetAchievement("ACH_WIN_ONE_GAME");
-                m_AchievementGranted = true;
+                m_WinnerAchievementGranted = true;
             }
         #endif
         }
