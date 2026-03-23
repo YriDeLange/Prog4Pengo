@@ -8,18 +8,27 @@ namespace dae
     {
     public:
         using EventHandler = std::function<void(unsigned int eventId)>;
+        using ObserverId = size_t;
 
-        void AddObserver(EventHandler handler)
+        ObserverId AddObserver(EventHandler handler)
         {
-            m_Handlers.push_back(std::move(handler));
+            m_Handlers.emplace_back(m_NextId, std::move(handler));
+            return m_NextId++;
         }
+
+        void RemoveObserver(ObserverId id)
+        {
+            std::erase_if(m_Handlers, [id](const auto& pair) { return pair.first == id; });
+        }
+
         void Notify(unsigned int eventId)
         {
-            for (auto& handler : m_Handlers)
+            for (auto& [id, handler] : m_Handlers)
                 handler(eventId);
         }
 
     private:
-        std::vector<EventHandler> m_Handlers;
+        std::vector<std::pair<ObserverId, EventHandler>> m_Handlers;
+        ObserverId m_NextId{ 0 };
     };
 }

@@ -171,7 +171,7 @@ static void load()
 			});
 		points->AddObserver([pointsDisplay, points](unsigned int eventId)
 			{
-				if (eventId == GameEvent::PointsScored)
+				if (eventId == GameEvent::EnemyDied)
 					pointsDisplay->OnPointsScored(points->GetPoints());
 			});
 
@@ -204,7 +204,7 @@ static void load()
 
 		points2->AddObserver([pointsDisplay2, points2](unsigned int eventId)
 			{
-				if (eventId == GameEvent::PointsScored)
+				if (eventId == GameEvent::EnemyDied)
 					pointsDisplay2->OnPointsScored(points2->GetPoints());
 			});
 

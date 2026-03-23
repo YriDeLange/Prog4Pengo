@@ -16,9 +16,14 @@ namespace dae
 
         int GetLives() const { return m_Lives; }
 
-        void AddObserver(Subject::EventHandler handler)
+        Subject::ObserverId AddObserver(Subject::EventHandler handler)
         {
-            m_Subject.AddObserver(std::move(handler));
+            return m_Subject.AddObserver(std::move(handler));
+        }
+
+        void RemoveObserver(Subject::ObserverId id)
+        {
+            m_Subject.RemoveObserver(id);
         }
 
         void Die()

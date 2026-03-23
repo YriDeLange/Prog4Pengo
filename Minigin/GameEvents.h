@@ -29,5 +29,4 @@ namespace GameEvent
 {
     inline constexpr unsigned int PlayerDied = make_sdbm_hash("PlayerDied");
     inline constexpr unsigned int EnemyDied = make_sdbm_hash("EnemyDied");
-    inline constexpr unsigned int PointsScored = make_sdbm_hash("PointsScored");
 }
