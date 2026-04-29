@@ -134,7 +134,18 @@ if(NOT SDL3_mixer_FOUND)
         list(PREPEND CMAKE_PREFIX_PATH "${sdl3_mixer_SOURCE_DIR}")
         find_package(SDL3_mixer CONFIG REQUIRED)
     else()
-        message(FATAL_ERROR "SDL3_mixer not found")
+        FetchContent_Declare(
+            SDL3_mixer
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
+            GIT_TAG release-3.2.0
+            GIT_SHALLOW TRUE
+        )
+        set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
+        set(SDLMIXER_WAV ON CACHE BOOL "" FORCE)
+        set(SDLMIXER_OGG ON CACHE BOOL "" FORCE)
+        set(SDLMIXER_MP3 ON CACHE BOOL "" FORCE)
+
+        FetchContent_MakeAvailable(SDL3_mixer)
     endif()
 endif()
 
