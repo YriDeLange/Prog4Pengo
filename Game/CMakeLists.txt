@@ -78,7 +78,12 @@ endif()
 
 # ====================== EMSCRIPTEN SETTINGS ======================
 if(EMSCRIPTEN)
-    set(EMSCRIPTEN_LINK_FLAGS "-sUSE_SDL=3 -sUSE_FREETYPE=1 -sUSE_HARFBUZZ=1 -sALLOW_MEMORY_GROWTH --preload-file \"${CMAKE_SOURCE_DIR}/Data@/\"")
+    set(EMSCRIPTEN_LINK_FLAGS 
+        "-sUSE_SDL=3 \
+         -sUSE_FREETYPE=1 \
+         -sUSE_HARFBUZZ=1 \
+         -sALLOW_MEMORY_GROWTH=1 \
+         --preload-file \"${CMAKE_SOURCE_DIR}/Data@/\"")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
         COMPILE_FLAGS "-g"
