@@ -106,25 +106,23 @@ if(NOT SDL3_ttf_FOUND)
             set(HARFBUZZ_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/harfbuzz" CACHE PATH "" FORCE)
             set(HARFBUZZ_LIBRARY "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
             set(HARFBUZZ_LIBRARIES "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
-
-            if(NOT TARGET Freetype::Freetype)
-                add_library(Freetype::Freetype INTERFACE IMPORTED)
-                set_target_properties(Freetype::Freetype PROPERTIES
-                    INTERFACE_INCLUDE_DIRECTORIES "${FREETYPE_INCLUDE_DIRS}"
-                    INTERFACE_LINK_LIBRARIES "${FREETYPE_LIBRARIES}"
-                )
-            endif()
-
-            if(NOT TARGET harfbuzz::harfbuzz)
-                add_library(harfbuzz::harfbuzz INTERFACE IMPORTED)
-                set_target_properties(harfbuzz::harfbuzz PROPERTIES
-                    INTERFACE_INCLUDE_DIRECTORIES "${HARFBUZZ_INCLUDE_DIRS}"
-                    INTERFACE_LINK_LIBRARIES "${HARFBUZZ_LIBRARIES}"
-                )
-            endif()
         endif()
 
         FetchContent_MakeAvailable(SDL3_ttf)
+
+        if(EMSCRIPTEN AND TARGET Freetype::Freetype)
+            set_target_properties(Freetype::Freetype PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/freetype2"
+                INTERFACE_LINK_LIBRARIES "${CMAKE_SYSROOT}/lib/libfreetype.a"
+            )
+        endif()
+
+        if(EMSCRIPTEN AND TARGET harfbuzz::harfbuzz)
+            set_target_properties(harfbuzz::harfbuzz PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/harfbuzz"
+                INTERFACE_LINK_LIBRARIES "${CMAKE_SYSROOT}/lib/libharfbuzz.a"
+            )
+        endif()
     endif()
 endif()
 
