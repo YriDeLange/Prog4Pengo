@@ -13,6 +13,8 @@
 #include "MoveCommand.h"
 #include "DieCommand.h"
 #include "AddPointsCommand.h"
+#include "ServiceLocator.h"
+#include "SoundSystem.h"
 
 // Components
 #include "GameObject.h"
@@ -55,33 +57,33 @@ static void load()
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 	auto& rm = dae::ResourceManager::GetInstance();
 
-	// --- Background ---
-	{
-		auto go = std::make_unique<dae::GameObject>();
-		auto* render = go->AddComponent<dae::RenderComponent>();
-		render->SetTexture("background.png");
-		scene.Add(std::move(go));
-	}
+	//// --- Background ---
+	//{
+	//	auto go = std::make_unique<dae::GameObject>();
+	//	auto* render = go->AddComponent<dae::RenderComponent>();
+	//	render->SetTexture("background.png");
+	//	scene.Add(std::move(go));
+	//}
 
-	// --- Logo ---
-	{
-		auto go = std::make_unique<dae::GameObject>();
-		go->SetLocalPosition(358.f, 180.f);
-		auto* render = go->AddComponent<dae::RenderComponent>();
-		render->SetTexture("logo.png");
-		scene.Add(std::move(go));
-	}
+	//// --- Logo ---
+	//{
+	//	auto go = std::make_unique<dae::GameObject>();
+	//	go->SetLocalPosition(358.f, 180.f);
+	//	auto* render = go->AddComponent<dae::RenderComponent>();
+	//	render->SetTexture("logo.png");
+	//	scene.Add(std::move(go));
+	//}
 
-	// --- Title text ---
-	{
-		auto font = rm.LoadFont("Lingua.otf", 36);
-		auto go = std::make_unique<dae::GameObject>();
-		go->SetLocalPosition(292.f, 20.f);
-		go->AddComponent<dae::RenderComponent>();
-		auto* text = go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-		text->SetColor({ 255, 255, 0, 255 });
-		scene.Add(std::move(go));
-	}
+	//// --- Title text ---
+	//{
+	//	auto font = rm.LoadFont("Lingua.otf", 36);
+	//	auto go = std::make_unique<dae::GameObject>();
+	//	go->SetLocalPosition(292.f, 20.f);
+	//	go->AddComponent<dae::RenderComponent>();
+	//	auto* text = go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
+	//	text->SetColor({ 255, 255, 0, 255 });
+	//	scene.Add(std::move(go));
+	//}
 
 	// --- FPS counter (top-left) ---
 	{
@@ -167,7 +169,10 @@ static void load()
 		health->AddObserver([livesDisplay](unsigned int eventId)
 			{
 				if (eventId == GameEvent::PlayerDied)
+				{
 					livesDisplay->OnPlayerDied();
+					dae::ServiceLocator::GetSoundSystem().Play(0, 1.0f);
+				}
 			});
 		points->AddObserver([pointsDisplay, points](unsigned int eventId)
 			{
@@ -199,7 +204,10 @@ static void load()
 		health2->AddObserver([livesDisplay2](unsigned int eventId)
 			{
 				if (eventId == GameEvent::PlayerDied)
+				{
 					livesDisplay2->OnPlayerDied();
+					dae::ServiceLocator::GetSoundSystem().Play(0, 1.0f);
+				}
 			});
 
 		points2->AddObserver([pointsDisplay2, points2](unsigned int eventId)
@@ -211,6 +219,9 @@ static void load()
 		auto& input = dae::InputManager::GetInstance();
 		float speedP1 = 100.f;
 		float speedP2 = 200.f;
+
+		auto& soundSys = dae::ServiceLocator::GetSoundSystem();
+		soundSys.LoadSound(0, "Data/Miss.mp3");
 
 		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, speedP1));

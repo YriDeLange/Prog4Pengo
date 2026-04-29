@@ -1,0 +1,108 @@
+cmake_minimum_required(VERSION 3.26)
+project(PengoGame)
+
+if(EMSCRIPTEN)
+    set(TARGET_NAME minigin_web)
+    set(TARGET_PARAM )
+else()
+    set(TARGET_NAME PengoGame)
+    set(TARGET_PARAM WIN32)
+endif()
+
+add_executable(${TARGET_NAME} ${TARGET_PARAM}
+    Main.cpp
+)
+
+target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
+
+target_link_libraries(${TARGET_NAME} PRIVATE Minigin)
+
+# ====================== MAKE SDL TARGETS VISIBLE IN GAME SCOPE ======================
+# This is the key fix — re-find the packages so the imported targets are available here
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_ttf CONFIG REQUIRED)
+find_package(SDL3_mixer CONFIG REQUIRED)
+
+# ====================== POST-BUILD SETUP ======================
+
+# Always copy the Data folder
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/Data"
+        "$<TARGET_FILE_DIR:${TARGET_NAME}>/Data"
+    COMMENT "Copying Data folder"
+)
+
+if(NOT EMSCRIPTEN AND WIN32)
+    # Copy SDL3.dll
+    if(TARGET SDL3::SDL3)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:SDL3::SDL3>"
+                "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+            COMMENT "Copying SDL3.dll"
+            VERBATIM
+        )
+    endif()
+
+    # Copy SDL3_ttf.dll
+    if(TARGET SDL3_ttf::SDL3_ttf)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:SDL3_ttf::SDL3_ttf>"
+                "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+            COMMENT "Copying SDL3_ttf.dll"
+            VERBATIM
+        )
+    endif()
+
+    if(TARGET SDL3_mixer::SDL3_mixer)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:SDL3_mixer::SDL3_mixer>"
+                "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+            COMMENT "Copying SDL3_mixer.dll"
+            VERBATIM
+        )
+    endif()
+
+    # Steam support (if enabled)
+    if(Steamworks_FOUND)
+        if(WIN32 AND DEFINED Steamworks_RUNTIME_DLL)
+            add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${Steamworks_RUNTIME_DLL}"
+                    "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+                COMMENT "Copying steam_api64.dll"
+            )
+        endif()
+
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
+            COMMENT "Creating steam_appid.txt"
+        )
+    endif()
+
+    # Visual Studio settings
+    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET_NAME})
+    set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET_NAME}>")
+endif()
+
+# ====================== EMSCRIPTEN SETTINGS ======================
+if(EMSCRIPTEN)
+    set(EMSCRIPTEN_LINK_FLAGS "-sUSE_SDL=3 -sUSE_FREETYPE=1 -sUSE_HARFBUZZ=1 -sALLOW_MEMORY_GROWTH --preload-file \"${CMAKE_SOURCE_DIR}/Data@/\"")
+
+    set_target_properties(${TARGET_NAME} PROPERTIES
+        COMPILE_FLAGS "-g"
+        LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
+    )
+
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${CMAKE_SOURCE_DIR}/web"
+            "$<TARGET_FILE_DIR:${TARGET_NAME}>/"
+        COMMENT "Copying web files"
+    )
+
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()

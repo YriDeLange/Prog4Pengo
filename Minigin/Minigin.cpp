@@ -16,6 +16,8 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include "GameTime.h"
+#include "ServiceLocator.h"
+#include "SoundSystemImpl.h"
 #include "SteamGlobals.h"
 
 #if USE_STEAMWORKS
@@ -78,6 +80,10 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 	}
 
+	if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+		std::cerr << "SDL_INIT_AUDIO failed: " << SDL_GetError() << std::endl;
+	}
+
 	g_window = SDL_CreateWindow(
 		"Programming 4 assignment",
 		1024,
@@ -91,6 +97,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 
 	Renderer::GetInstance().Init(g_window);
 	ResourceManager::GetInstance().Init(dataPath);
+	ServiceLocator::RegisterSoundSystem(std::make_unique<SoundSystemImpl>());
 }
 
 dae::Minigin::~Minigin()
@@ -104,6 +111,7 @@ dae::Minigin::~Minigin()
 		}
 	#endif
 
+	ServiceLocator::Shutdown();
 	Renderer::GetInstance().Destroy();
 	SDL_DestroyWindow(g_window);
 	g_window = nullptr;
