@@ -92,17 +92,24 @@ if(NOT SDL3_ttf_FOUND)
             list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/emscripten")
 
             set(SDL3TTF_VENDORED OFF CACHE BOOL "" FORCE)
-            set(SDL3TTF_USE_SYSTEM_FREETYPE ON CACHE BOOL "" FORCE)
             set(SDL3TTF_SYSTEM_FREETYPE ON CACHE BOOL "" FORCE)
             set(SDL3TTF_HARFBUZZ ON CACHE BOOL "" FORCE)
             set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
             set(SDL3TTF_INSTALL OFF CACHE BOOL "" FORCE)
 
             find_package(Freetype REQUIRED)
+
             find_package(HarfBuzz QUIET)
         endif()
 
         FetchContent_MakeAvailable(SDL3_ttf)
+
+        if(EMSCRIPTEN AND TARGET Freetype::Freetype)
+            set_target_properties(Freetype::Freetype PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/freetype2"
+                INTERFACE_LINK_LIBRARIES "${CMAKE_SYSROOT}/lib/libfreetype.a"
+            )
+        endif()
     endif()
 endif()
 
