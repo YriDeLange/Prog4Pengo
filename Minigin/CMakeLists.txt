@@ -33,10 +33,6 @@ target_compile_features(Minigin PUBLIC cxx_std_20)
 # --------------------- Dependencies (exactly like before) ---------------------
 include(FetchContent)
 
-if(EMSCRIPTEN)
-    add_compile_options(-sUSE_SDL=3 -sUSE_FREETYPE=1 -sUSE_HARFBUZZ=1)
-endif()
-
 # glm
 find_package(glm CONFIG QUIET)
 if(NOT glm_FOUND)
@@ -91,11 +87,10 @@ if(NOT SDL3_ttf_FOUND)
             GIT_SHALLOW TRUE
         )
 
-        set(SDL3TTF_VENDORED OFF CACHE BOOL "" FORCE)
-        set(SDL3TTF_SYSTEM_FREETYPE OFF CACHE BOOL "" FORCE)
-        set(SDL3TTF_HARFBUZZ OFF CACHE BOOL "" FORCE)
-        set(SDL3TTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
-        set(SDL3TTF_INSTALL OFF CACHE BOOL "" FORCE)
+        set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
+        set(SDLTTF_HARFBUZZ ON CACHE BOOL "" FORCE)
+        set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
+        set(SDLTTF_INSTALL OFF CACHE BOOL "" FORCE)
 
         FetchContent_MakeAvailable(SDL3_ttf)
     endif()
