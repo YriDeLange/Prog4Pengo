@@ -92,45 +92,17 @@ if(NOT SDL3_ttf_FOUND)
             list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/emscripten")
 
             set(SDL3TTF_VENDORED OFF CACHE BOOL "" FORCE)
+            set(SDL3TTF_USE_SYSTEM_FREETYPE ON CACHE BOOL "" FORCE)
             set(SDL3TTF_SYSTEM_FREETYPE ON CACHE BOOL "" FORCE)
             set(SDL3TTF_HARFBUZZ ON CACHE BOOL "" FORCE)
             set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
             set(SDL3TTF_INSTALL OFF CACHE BOOL "" FORCE)
 
-            if(NOT TARGET Freetype::Freetype)
-                add_library(Freetype::Freetype INTERFACE IMPORTED)
-                set_target_properties(Freetype::Freetype PROPERTIES
-                    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/freetype2"
-                    INTERFACE_LINK_LIBRARIES "${CMAKE_SYSROOT}/lib/libfreetype.a"
-                )
-            endif()
-
-            if(NOT TARGET harfbuzz::harfbuzz)
-                add_library(harfbuzz::harfbuzz INTERFACE IMPORTED)
-                set_target_properties(harfbuzz::harfbuzz PROPERTIES
-                    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/harfbuzz"
-                    INTERFACE_LINK_LIBRARIES "${CMAKE_SYSROOT}/lib/libharfbuzz.a"
-                )
-            endif()
-
-            set(FREETYPE_FOUND TRUE CACHE BOOL "" FORCE)
-            set(FREETYPE_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/freetype2" CACHE PATH "" FORCE)
-            set(FREETYPE_LIBRARY "${CMAKE_SYSROOT}/lib/libfreetype.a" CACHE FILEPATH "" FORCE)
-            set(FREETYPE_LIBRARIES "${CMAKE_SYSROOT}/lib/libfreetype.a" CACHE FILEPATH "" FORCE)
-
-            set(HARFBUZZ_FOUND TRUE CACHE BOOL "" FORCE)
-            set(HARFBUZZ_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/harfbuzz" CACHE PATH "" FORCE)
-            set(HARFBUZZ_LIBRARY "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
-            set(HARFBUZZ_LIBRARIES "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
+            find_package(Freetype REQUIRED)
+            find_package(HarfBuzz QUIET)
         endif()
 
         FetchContent_MakeAvailable(SDL3_ttf)
-
-        if(EMSCRIPTEN AND TARGET Freetype::Freetype)
-            set_target_properties(Freetype::Freetype PROPERTIES
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/freetype2"
-            )
-        endif()
     endif()
 endif()
 
