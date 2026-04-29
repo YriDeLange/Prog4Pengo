@@ -87,12 +87,24 @@ if(NOT SDL3_ttf_FOUND)
             GIT_SHALLOW TRUE
         )
         set(SDL3TTF_INSTALL OFF)
+
         if(EMSCRIPTEN)
             list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/emscripten")
+
             set(SDL3TTF_USE_SYSTEM_FREETYPE ON)
             set(SDL3TTF_VENDORED OFF)
+            set(SDL3TTF_HARFBUZZ ON)
             set(SDLTTF_PLUTOSVG OFF)
+
+            if(NOT TARGET Freetype::Freetype)
+                add_library(Freetype::Freetype INTERFACE IMPORTED)
+            endif()
+
+            if(NOT TARGET harfbuzz::harfbuzz)
+                add_library(harfbuzz::harfbuzz INTERFACE IMPORTED)
+            endif()
         endif()
+
         FetchContent_MakeAvailable(SDL3_ttf)
     endif()
 endif()
