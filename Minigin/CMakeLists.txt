@@ -96,6 +96,16 @@ if(NOT SDL3_ttf_FOUND)
             set(SDL3TTF_HARFBUZZ ON CACHE BOOL "" FORCE)
             set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
             set(SDL3TTF_INSTALL OFF CACHE BOOL "" FORCE)
+
+            set(FREETYPE_FOUND TRUE CACHE BOOL "" FORCE)
+            set(FREETYPE_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/freetype2" CACHE PATH "" FORCE)
+            set(FREETYPE_LIBRARY "${CMAKE_SYSROOT}/lib/libfreetype.a" CACHE FILEPATH "" FORCE)
+            set(FREETYPE_LIBRARIES "${CMAKE_SYSROOT}/lib/libfreetype.a" CACHE FILEPATH "" FORCE)
+
+            set(HARFBUZZ_FOUND TRUE CACHE BOOL "" FORCE)
+            set(HARFBUZZ_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/harfbuzz" CACHE PATH "" FORCE)
+            set(HARFBUZZ_LIBRARY "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
+            set(HARFBUZZ_LIBRARIES "${CMAKE_SYSROOT}/lib/libharfbuzz.a" CACHE FILEPATH "" FORCE)
         endif()
 
         FetchContent_MakeAvailable(SDL3_ttf)
