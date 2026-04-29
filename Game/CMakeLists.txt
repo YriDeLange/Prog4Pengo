@@ -17,15 +17,7 @@ target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 
 target_link_libraries(${TARGET_NAME} PRIVATE Minigin)
 
-# ====================== MAKE SDL TARGETS VISIBLE IN GAME SCOPE ======================
-# This is the key fix — re-find the packages so the imported targets are available here
-find_package(SDL3 CONFIG REQUIRED)
-find_package(SDL3_ttf CONFIG REQUIRED)
-find_package(SDL3_mixer CONFIG REQUIRED)
 
-# ====================== POST-BUILD SETUP ======================
-
-# Always copy the Data folder
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/Data"
@@ -34,6 +26,10 @@ add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
 )
 
 if(NOT EMSCRIPTEN AND WIN32)
+    find_package(SDL3 CONFIG REQUIRED)
+    find_package(SDL3_ttf CONFIG REQUIRED)
+    find_package(SDL3_mixer CONFIG REQUIRED)
+
     # Copy SDL3.dll
     if(TARGET SDL3::SDL3)
         add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
@@ -45,26 +41,18 @@ if(NOT EMSCRIPTEN AND WIN32)
         )
     endif()
 
-    # Copy SDL3_ttf.dll
-    if(TARGET SDL3_ttf::SDL3_ttf)
-        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:SDL3_ttf::SDL3_ttf>"
-                "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-            COMMENT "Copying SDL3_ttf.dll"
-            VERBATIM
-        )
-    endif()
-
-    if(TARGET SDL3_mixer::SDL3_mixer)
-        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:SDL3_mixer::SDL3_mixer>"
-                "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-            COMMENT "Copying SDL3_mixer.dll"
-            VERBATIM
-        )
-    endif()
+    # Copy SDL3_ttf.dll + SDL3_mixer.dll
+    foreach(dllTarget SDL3_ttf::SDL3_ttf SDL3_mixer::SDL3_mixer)
+        if(TARGET ${dllTarget})
+            add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${dllTarget}>"
+                    "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+                COMMENT "Copying SDL dll"
+                VERBATIM
+            )
+        endif()
+    endforeach()
 
     # Steam support (if enabled)
     if(Steamworks_FOUND)
