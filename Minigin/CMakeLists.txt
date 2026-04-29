@@ -91,15 +91,12 @@ if(NOT SDL3_ttf_FOUND)
         if(EMSCRIPTEN)
             list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/emscripten")
 
-            # Tell SDL3_ttf to use Emscripten's ports
             set(SDL3TTF_VENDORED OFF CACHE BOOL "" FORCE)
             set(SDL3TTF_SYSTEM_FREETYPE ON CACHE BOOL "" FORCE)
             set(SDL3TTF_HARFBUZZ ON CACHE BOOL "" FORCE)
             set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
             set(SDL3TTF_INSTALL OFF CACHE BOOL "" FORCE)
 
-            # === CRITICAL: Create proper imported targets BEFORE FetchContent_MakeAvailable ===
-            # This prevents SDL3_ttf from creating a broken Freetype::Freetype target
             if(NOT TARGET Freetype::Freetype)
                 add_library(Freetype::Freetype INTERFACE IMPORTED)
                 set_target_properties(Freetype::Freetype PROPERTIES
@@ -116,7 +113,6 @@ if(NOT SDL3_ttf_FOUND)
                 )
             endif()
 
-            # Also set legacy variables (helps some internal checks)
             set(FREETYPE_FOUND TRUE CACHE BOOL "" FORCE)
             set(FREETYPE_INCLUDE_DIRS "${CMAKE_SYSROOT}/include/freetype2" CACHE PATH "" FORCE)
             set(FREETYPE_LIBRARY "${CMAKE_SYSROOT}/lib/libfreetype.a" CACHE FILEPATH "" FORCE)
@@ -129,6 +125,12 @@ if(NOT SDL3_ttf_FOUND)
         endif()
 
         FetchContent_MakeAvailable(SDL3_ttf)
+
+        if(EMSCRIPTEN AND TARGET Freetype::Freetype)
+            set_target_properties(Freetype::Freetype PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SYSROOT}/include/freetype2"
+            )
+        endif()
     endif()
 endif()
 
