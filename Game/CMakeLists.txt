@@ -88,21 +88,14 @@ if(EMSCRIPTEN)
          -sUSE_HARFBUZZ=1 \
          -sALLOW_MEMORY_GROWTH=1 \
          -sINITIAL_MEMORY=64MB \
-         --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\"")
+         --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\" \
+         --shell-file \"${CMAKE_SOURCE_DIR}/web/index.html\"")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
-        OUTPUT_NAME "minigin_web"
+        OUTPUT_NAME "index"
         SUFFIX ".html"
         COMPILE_FLAGS "-g0"
         LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
-    )
-
-    # Copy web files (index.html, not shell.html)
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/web/index.html"
-            "$<TARGET_FILE_DIR:${TARGET_NAME}>/index.html"
-        COMMENT "Copying web files"
     )
 
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
