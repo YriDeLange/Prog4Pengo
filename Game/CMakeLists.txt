@@ -80,12 +80,16 @@ endif()
 if(EMSCRIPTEN)
     set(TARGET_NAME minigin_web)
 
+    # Emscripten link flags
     set(EMSCRIPTEN_LINK_FLAGS 
         "-sUSE_SDL=3 \
+         -sUSE_SDL_TTF=3 \
+         -sUSE_SDL_MIXER=3 \
+         -sUSE_FREETYPE=1 \
+         -sUSE_HARFBUZZ=1 \
          -sALLOW_MEMORY_GROWTH=1 \
          -sINITIAL_MEMORY=64MB \
-         --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\" \
-         --shell-file \"${CMAKE_SOURCE_DIR}/web/shell.html\"")
+         --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\"")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
         OUTPUT_NAME "minigin_web"
@@ -94,11 +98,11 @@ if(EMSCRIPTEN)
         LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
     )
 
-    # Copy web files
+    # Copy web files (index.html, not shell.html)
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_SOURCE_DIR}/web"
-            "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/web/index.html"
+            "$<TARGET_FILE_DIR:${TARGET_NAME}>/index.html"
         COMMENT "Copying web files"
     )
 

@@ -30,7 +30,7 @@ add_library(Minigin STATIC
 
 target_compile_features(Minigin PUBLIC cxx_std_20)
 
-# --------------------- Dependencies (exactly like before) ---------------------
+# --------------------- Dependencies ---------------------
 include(FetchContent)
 
 # glm
@@ -92,6 +92,11 @@ if(NOT SDL3_ttf_FOUND)
         set(SDLTTF_PLUTOSVG OFF CACHE BOOL "" FORCE)
         set(SDLTTF_INSTALL OFF CACHE BOOL "" FORCE)
 
+        # Emscripten-specific settings for SDL3_ttf
+        if(EMSCRIPTEN)
+            list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/emscripten")
+        endif()
+
         FetchContent_MakeAvailable(SDL3_ttf)
     endif()
 endif()
@@ -108,7 +113,8 @@ if(NOT SDL3_mixer_FOUND)
         FetchContent_MakeAvailable(SDL3_mixer)
         list(PREPEND CMAKE_PREFIX_PATH "${sdl3_mixer_SOURCE_DIR}")
         find_package(SDL3_mixer CONFIG REQUIRED)
-    else()
+    elseif(NOT EMSCRIPTEN)
+        # Only fetch SDL3_mixer source for non-Emscripten Linux builds
         FetchContent_Declare(
             SDL3_mixer
             GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
@@ -122,6 +128,7 @@ if(NOT SDL3_mixer_FOUND)
 
         FetchContent_MakeAvailable(SDL3_mixer)
     endif()
+    # For Emscripten, SDL3_mixer is provided by USE_SDL_MIXER=1 flag
 endif()
 
 # Dear ImGui
@@ -177,7 +184,6 @@ target_include_directories(Minigin PUBLIC
     ${glm_SOURCE_DIR}
     ${sdl3_SOURCE_DIR}/include
     ${sdl3_ttf_SOURCE_DIR}/include
-    ${sdl3_mixer_SOURCE_DIR}/include
     ${imgui_SOURCE_DIR}
     ${VLD_INCLUDE_DIR}
 )
@@ -185,11 +191,16 @@ target_include_directories(Minigin PUBLIC
 target_link_libraries(Minigin PUBLIC
     SDL3::SDL3
     SDL3_ttf::SDL3_ttf
-    SDL3_mixer::SDL3_mixer
     imgui
     implot
     ${VLD_LIBRARIES}
 )
+
+# Link SDL3_mixer only on non-Emscripten platforms
+if(NOT EMSCRIPTEN)
+    target_include_directories(Minigin PUBLIC ${sdl3_mixer_SOURCE_DIR}/include)
+    target_link_libraries(Minigin PUBLIC SDL3_mixer::SDL3_mixer)
+endif()
 
 if(WIN32)
     target_link_libraries(Minigin PUBLIC xinput)
