@@ -113,22 +113,21 @@ if(NOT SDL3_mixer_FOUND)
         FetchContent_MakeAvailable(SDL3_mixer)
         list(PREPEND CMAKE_PREFIX_PATH "${sdl3_mixer_SOURCE_DIR}")
         find_package(SDL3_mixer CONFIG REQUIRED)
-    elseif(NOT EMSCRIPTEN)
-        # Only fetch SDL3_mixer source for non-Emscripten Linux builds
+    else()
         FetchContent_Declare(
             SDL3_mixer
             GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
             GIT_TAG release-3.2.0
             GIT_SHALLOW TRUE
         )
+
         set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
-        set(SDLMIXER_WAV ON CACHE BOOL "" FORCE)
-        set(SDLMIXER_OGG ON CACHE BOOL "" FORCE)
-        set(SDLMIXER_MP3 ON CACHE BOOL "" FORCE)
+        set(SDLMIXER_WAV     ON  CACHE BOOL "" FORCE)
+        set(SDLMIXER_OGG     ON  CACHE BOOL "" FORCE)
+        set(SDLMIXER_MP3     ON  CACHE BOOL "" FORCE)
 
         FetchContent_MakeAvailable(SDL3_mixer)
     endif()
-    # For Emscripten, SDL3_mixer is provided by USE_SDL_MIXER=1 flag
 endif()
 
 # Dear ImGui
@@ -196,11 +195,8 @@ target_link_libraries(Minigin PUBLIC
     ${VLD_LIBRARIES}
 )
 
-# Link SDL3_mixer only on non-Emscripten platforms
-if(NOT EMSCRIPTEN)
-    target_include_directories(Minigin PUBLIC ${sdl3_mixer_SOURCE_DIR}/include)
-    target_link_libraries(Minigin PUBLIC SDL3_mixer::SDL3_mixer)
-endif()
+target_include_directories(Minigin PUBLIC ${sdl3_mixer_SOURCE_DIR}/include)
+target_link_libraries(Minigin PUBLIC SDL3_mixer::SDL3_mixer)
 
 if(WIN32)
     target_link_libraries(Minigin PUBLIC xinput)
