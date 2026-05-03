@@ -87,14 +87,16 @@ if(EMSCRIPTEN)
          -sUSE_FREETYPE=1 \
          -sUSE_HARFBUZZ=1 \
          -sALLOW_MEMORY_GROWTH=1 \
-         -sINITIAL_MEMORY=64MB \
+         -sINITIAL_MEMORY=67108864 \
+         -sASSERTIONS=1 \
+         -sSTACK_OVERFLOW_CHECK=2 \
          --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\" \
          --shell-file \"${CMAKE_SOURCE_DIR}/web/index.html\"")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
         OUTPUT_NAME "index"
         SUFFIX ".html"
-        COMPILE_FLAGS "-g0"
+        COMPILE_FLAGS "-g"
         LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
     )
 
