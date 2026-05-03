@@ -90,13 +90,15 @@ if(EMSCRIPTEN)
          -sINITIAL_MEMORY=67108864 \
          -sASSERTIONS=1 \
          -sSTACK_OVERFLOW_CHECK=2 \
+         -pthread \
+         -sPTHREAD_POOL_SIZE=4 \
          --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\" \
          --shell-file \"${CMAKE_SOURCE_DIR}/web/index.html\"")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
         OUTPUT_NAME "index"
         SUFFIX ".html"
-        COMPILE_FLAGS "-g"
+        COMPILE_FLAGS "-g -pthread"
         LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}"
     )
 
