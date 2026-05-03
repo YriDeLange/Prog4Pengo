@@ -259,6 +259,9 @@ static void load()
 
 int main(int, char*[]) {
 #if __EMSCRIPTEN__
+	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR);
+#endif
+#if __EMSCRIPTEN__
 	fs::path data_location = "/Data/";
 #else
 	fs::path data_location = "./Data/";
