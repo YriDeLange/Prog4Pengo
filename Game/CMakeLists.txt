@@ -92,6 +92,7 @@ if(EMSCRIPTEN)
          -sSTACK_OVERFLOW_CHECK=2 \
          -pthread \
          -sPTHREAD_POOL_SIZE=4 \
+         -sNO_DISABLE_EXCEPTION_CATCHING=1 \
          --preload-file \"${CMAKE_SOURCE_DIR}/Data@/Data\" \
          --shell-file \"${CMAKE_SOURCE_DIR}/web/index.html\"")
 
