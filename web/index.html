@@ -14,6 +14,7 @@
 
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: #000;
@@ -27,11 +28,36 @@
         #canvas {
             display: block;
         }
+
+        #status {
+            color: white;
+            font-family: monospace;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #output {
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+
+        .error {
+            color: #f00 !important;
+        }
     </style>
 </head>
 <body>
+    <div id="status">Loading...</div>
     <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <div id="output"></div>
     <script type='text/javascript'>
+        var statusElement = document.getElementById('status');
+        var outputElement = document.getElementById('output');
+
         var Module = {
         preRun: [],
         postRun: [],
@@ -39,11 +65,15 @@
         return function(text) {
         if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
         console.log(text);
+        outputElement.innerHTML += text + '<br>';
+        outputElement.scrollTop = outputElement.scrollHeight;
         };
         })(),
         printErr: function(text) {
         if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
         console.error(text);
+        outputElement.innerHTML += '<span class="error">ERROR: ' + text + '</span><br>';
+        outputElement.scrollTop = outputElement.scrollHeight;
         },
         canvas: (function() {
         var canvas = document.getElementById('canvas');
@@ -54,7 +84,12 @@
         return canvas;
         })(),
         setStatus: function(text) {
-        if (text) console.log(text);
+        if (!text) {
+        statusElement.style.display = 'none';
+        } else {
+        statusElement.innerHTML = text;
+        console.log('[Status] ' + text);
+        }
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) {
@@ -63,11 +98,10 @@
         }
         };
         Module.setStatus('Downloading...');
-        window.onerror = function(event) {
+        window.onerror = function(event, source, lineno, colno, error) {
         Module.setStatus('Exception thrown, see JavaScript console');
-        Module.setStatus = function(text) {
-        if (text) console.error('[post-exception status] ' + text);
-        };
+        console.error('Error:', event, 'at', source, lineno, colno, error);
+        Module.printErr('Uncaught exception: ' + event);
         };
     </script>
     {{{ SCRIPT }}}
