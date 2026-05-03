@@ -221,7 +221,11 @@ static void load()
 		float speedP2 = 200.f;
 
 		auto& soundSys = dae::ServiceLocator::GetSoundSystem();
-		soundSys.LoadSound(0, "Data/Miss.mp3");
+		#if __EMSCRIPTEN__
+			soundSys.LoadSound(0, "/Data/Miss.mp3");
+		#else
+			soundSys.LoadSound(0, "Data/Miss.mp3");
+		#endif
 
 		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, speedP1));
@@ -255,10 +259,10 @@ static void load()
 
 int main(int, char*[]) {
 #if __EMSCRIPTEN__
-	fs::path data_location = "";
+	fs::path data_location = "/Data/";
 #else
 	fs::path data_location = "./Data/";
-	if(!fs::exists(data_location))
+	if (!fs::exists(data_location))
 		data_location = "../Data/";
 #endif
 	dae::Minigin engine(data_location);
