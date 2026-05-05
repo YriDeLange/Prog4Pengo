@@ -27,13 +27,19 @@ void dae::RenderComponent::Render() const
 void dae::RenderComponent::SetTexture(const std::string& filename)
 {
 	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
-	m_sourceRect = { 0, 0, 0, 0 };
+	if (m_sourceRect.w == 0 || m_sourceRect.h == 0)
+	{
+		m_sourceRect = { 0, 0, 0, 0 };
+	}
 }
 
 void dae::RenderComponent::SetTexture(std::shared_ptr<Texture2D> texture)
 {
 	m_texture = std::move(texture);
-	m_sourceRect = { 0, 0, 0, 0 };
+	if (m_sourceRect.w == 0 || m_sourceRect.h == 0)
+	{
+		m_sourceRect = { 0, 0, 0, 0 };
+	}
 }
 
 void dae::RenderComponent::SetSourceRect(const SDL_Rect& rect)
