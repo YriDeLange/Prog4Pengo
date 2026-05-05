@@ -5,7 +5,7 @@
 Pengo::Pengo(dae::GameObject* owner)
     : _owner(owner)
 {
-    _currentState = new StandingState(this);
+    _currentState = std::make_unique<StandingState>(this);
     _currentState->OnEnter();
 }
 
@@ -14,27 +14,30 @@ Pengo::~Pengo()
     if (_currentState)
     {
         _currentState->OnExit();
-        delete _currentState;
     }
 }
 
-void Pengo::SetState(PengoState* newState)
+void Pengo::SetState(std::unique_ptr<PengoState> state)
 {
     if (_currentState)
     {
         _currentState->OnExit();
-        delete _currentState;
     }
-    _currentState = newState;
-    if (_currentState) _currentState->OnEnter();
+
+    _currentState = std::move(state);
+
+    if (_currentState)
+    {
+        _currentState->OnEnter();
+    }
 }
 
 void Pengo::HandleInput(float dt)
 {
     if (_currentState)
     {
-        PengoState* newState = _currentState->HandleInput(dt);
-        if (newState) SetState(newState);
+        auto newState = _currentState->HandleInput(dt);
+        if (newState) SetState(std::move(newState));
     }
 }
 

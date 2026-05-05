@@ -8,14 +8,14 @@ void WalkingState::OnEnter()
     _pengo->SetSpriteFrame(0);   // start of walking animation for that direction
 }
 
-PengoState* WalkingState::HandleInput(float dt)
+std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
 {
     auto keyboard = SDL_GetKeyboardState(nullptr);
     bool moving = keyboard[SDL_SCANCODE_A] || keyboard[SDL_SCANCODE_D] ||
         keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_S];
 
     if (!moving)
-        return new StandingState(_pengo);
+        return std::make_unique<StandingState>(_pengo);
 
     // Optional: set direction based on last pressed key
     if (keyboard[SDL_SCANCODE_W]) _pengo->SetDirection(PengoDirection::Up);

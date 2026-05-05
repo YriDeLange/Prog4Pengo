@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 class Pengo;
 
@@ -13,6 +14,6 @@ public:
 
     virtual void OnEnter() = 0;
     virtual void OnExit() {}
-    virtual PengoState* HandleInput(float dt) { return nullptr; }
+    virtual std::unique_ptr<PengoState> HandleInput(float dt) { return nullptr; }
     virtual void Update(float dt) = 0;
 };

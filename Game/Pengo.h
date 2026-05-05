@@ -19,17 +19,11 @@ enum class PengoDirection
 
 class Pengo
 {
-private:
-    dae::GameObject* _owner = nullptr;
-    PengoState* _currentState = nullptr;
-    PengoDirection _direction = PengoDirection::Down;
-    int _currentFrame = 0;
-
 public:
     explicit Pengo(dae::GameObject* owner);
     ~Pengo();
 
-    void SetState(PengoState* newState);
+    void SetState(std::unique_ptr<PengoState> state);
 
     void HandleInput(float dt);
     void Update(float dt);
@@ -41,6 +35,10 @@ public:
     dae::GameObject* GetOwner() const { return _owner; }
 
 private:
+    dae::GameObject* _owner = nullptr;
+    std::unique_ptr<PengoState> _currentState;
+    PengoDirection _direction = PengoDirection::Down;
+    int _currentFrame = 0;
     static constexpr int FRAME_WIDTH = 16;
     static constexpr int FRAME_HEIGHT = 16;
     static constexpr const char* SPRITESHEET = "Pengo_Spritesheet.png";

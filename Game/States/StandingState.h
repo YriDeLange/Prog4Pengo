@@ -7,6 +7,6 @@ public:
     explicit StandingState(Pengo* pengo) : PengoState(pengo) {}
 
     void OnEnter() override;
-    PengoState* HandleInput(float dt) override;
+    std::unique_ptr<PengoState> HandleInput(float dt) override;
     void Update(float dt) override;
 };
