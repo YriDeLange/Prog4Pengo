@@ -1,11 +1,11 @@
 #include "StandingState.h"
 #include "../Pengo.h"
-#include <SDL3/SDL.h>
 #include "WalkingState.h"
+#include <SDL3/SDL.h>
 
 void StandingState::OnEnter()
 {
-    _pengo->SetSpriteFrame(PengoDirection::Down, 0);   // Force down + first frame
+    _pengo->SetSpriteFrame(PengoDirection::Down, 0);
 }
 
 std::unique_ptr<PengoState> StandingState::HandleInput(float dt)

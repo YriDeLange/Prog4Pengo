@@ -20,8 +20,6 @@ add_library(Minigin STATIC
     SteamGlobals.cpp
     TextComponent.cpp
     Texture2D.cpp
-    Transform.cpp
-    
 
     # Platform-specific Gamepad
     $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:Gamepad.cpp>

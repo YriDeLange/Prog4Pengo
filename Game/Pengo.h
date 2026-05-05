@@ -29,8 +29,12 @@ public:
     void Update(float dt);
 
     void SetDirection(PengoDirection dir);
+    PengoDirection GetDirection() const { return _direction; }
     void SetSpriteFrame(int frameIndex);
     void SetSpriteFrame(PengoDirection dir, int frame = 0);
+    int GetFrameOffsetForDirection(PengoDirection dir) const;
+    void SetVelocity(const glm::vec2& velocity);
+    const glm::vec2& GetVelocity() const { return m_velocity; }
 
     dae::GameObject* GetOwner() const { return _owner; }
 
@@ -42,4 +46,5 @@ private:
     static constexpr int FRAME_WIDTH = 16;
     static constexpr int FRAME_HEIGHT = 16;
     static constexpr const char* SPRITESHEET = "Pengo_Spritesheet.png";
+    glm::vec2 m_velocity{ 0.0f, 0.0f };
 };

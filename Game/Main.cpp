@@ -18,7 +18,6 @@
 
 // Components
 #include "GameObject.h"
-#include "TransformComponent.h"
 #include "RenderComponent.h"
 #include "TextComponent.h"
 #include "FPSComponent.h"
@@ -28,6 +27,7 @@
 #include "LivesDisplayComponent.h"
 #include "PointsComponent.h"
 #include "PointsDisplayComponent.h"
+#include "PengoComponent.h"
 
 // NEW: Pengo + State Pattern
 #include "Pengo.h"
@@ -92,6 +92,9 @@ static void load()
 		// ====================== PENGO (with State Pattern) ======================
 		auto pPlayer1Obj = std::make_unique<dae::GameObject>();
 		pPlayer1Obj->SetLocalPosition(100.f, 300.f);
+
+		pPlayer1Obj->AddComponent<dae::PengoComponent>();
+
 		pPlayer1Obj->AddComponent<dae::RenderComponent>();   // no SetTexture - Pengo will handle it via spritesheet
 
 		// Keep Pengo alive for the whole game
@@ -177,16 +180,6 @@ static void load()
 #else
 		soundSys.LoadSound(0, "Data/Miss.mp3");
 #endif
-
-		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, speedP1));
-		input.BindKeyboardCommand(SDL_SCANCODE_S, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0,  1 }, speedP1));
-		input.BindKeyboardCommand(SDL_SCANCODE_A, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ -1, 0 }, speedP1));
-		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, speedP1));
-
 		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Pressed,
 			std::make_unique<dae::DieCommand>(pPlayer1));
 		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Pressed,
@@ -205,13 +198,7 @@ static void load()
 			std::make_unique<dae::DieCommand>(pPlayer2));
 		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Pressed,
 			std::make_unique<dae::AddPointsCommand>(pPlayer2, 100));
-
-		// TODO (later): Call these every frame for full state behavior
-		// pPlayer1Pengo->HandleInput(deltaTime);
-		// pPlayer1Pengo->Update(deltaTime);
 	}
-
-	// You can call pPlayer1Pengo->HandleInput / Update from here once you add a proper game loop hook
 }
 
 int main(int, char* []) {

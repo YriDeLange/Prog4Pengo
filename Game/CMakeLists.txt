@@ -12,6 +12,7 @@ endif()
 add_executable(${TARGET_NAME} ${TARGET_PARAM}
     Main.cpp
     Pengo.cpp
+    PengoComponent.cpp
     States/StandingState.cpp
     States/WalkingState.cpp
     States/PushingState.cpp
