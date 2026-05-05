@@ -29,6 +29,9 @@
 #include "PointsComponent.h"
 #include "PointsDisplayComponent.h"
 
+// NEW: Pengo + State Pattern
+#include "Pengo.h"
+
 #if USE_STEAMWORKS
 #include "SteamAchievements.h"
 
@@ -50,40 +53,12 @@ namespace fs = std::filesystem;
 
 static void load()
 {
-	#if USE_STEAMWORKS
-		g_SteamAchievements = new CSteamAchievements(g_Achievements, 1);
-	#endif
+#if USE_STEAMWORKS
+	g_SteamAchievements = new CSteamAchievements(g_Achievements, 1);
+#endif
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 	auto& rm = dae::ResourceManager::GetInstance();
-
-	//// --- Background ---
-	//{
-	//	auto go = std::make_unique<dae::GameObject>();
-	//	auto* render = go->AddComponent<dae::RenderComponent>();
-	//	render->SetTexture("background.png");
-	//	scene.Add(std::move(go));
-	//}
-
-	//// --- Logo ---
-	//{
-	//	auto go = std::make_unique<dae::GameObject>();
-	//	go->SetLocalPosition(358.f, 180.f);
-	//	auto* render = go->AddComponent<dae::RenderComponent>();
-	//	render->SetTexture("logo.png");
-	//	scene.Add(std::move(go));
-	//}
-
-	//// --- Title text ---
-	//{
-	//	auto font = rm.LoadFont("Lingua.otf", 36);
-	//	auto go = std::make_unique<dae::GameObject>();
-	//	go->SetLocalPosition(292.f, 20.f);
-	//	go->AddComponent<dae::RenderComponent>();
-	//	auto* text = go->AddComponent<dae::TextComponent>("Programming 4 Assignment", font);
-	//	text->SetColor({ 255, 255, 0, 255 });
-	//	scene.Add(std::move(go));
-	//}
 
 	// --- FPS counter (top-left) ---
 	{
@@ -97,38 +72,7 @@ static void load()
 		scene.Add(std::move(go));
 	}
 
-	// --- SCENEGRAPH DEMO ---
-	{
-		/*auto pivotObj = std::make_unique<dae::GameObject>();
-		pivotObj->SetLocalPosition(320.f, 360.f);
-		dae::GameObject* pivot = pivotObj.get();
-		scene.Add(std::move(pivotObj));
-
-		auto pengoObj = std::make_unique<dae::GameObject>();
-		auto* render1 = pengoObj->AddComponent<dae::RenderComponent>();
-		render1->SetTexture("pengo.png");
-		pengoObj->AddComponent<dae::RotatorComponent>(10.f, -15.f, 0.f);
-		dae::GameObject* pengo = pengoObj.get();
-		pengo->SetParent(pivot, false);
-		scene.Add(std::move(pengoObj));
-
-		auto enemyObj = std::make_unique<dae::GameObject>();
-		auto* render2 = enemyObj->AddComponent<dae::RenderComponent>();
-		render2->SetTexture("sno-bee.png");
-		enemyObj->AddComponent<dae::RotatorComponent>(60.f, 6.f, 0.f);
-		dae::GameObject* enemy = enemyObj.get();
-		enemy->SetParent(pengo, false);
-		scene.Add(std::move(enemyObj));*/
-	}
-
-	// --- TRASH THE CACHE ---
-	/*{
-		auto go = std::make_unique<dae::GameObject>();
-		go->AddComponent<dae::CacheComponent>();
-		scene.Add(std::move(go));
-	}*/
-
-	// --- COMMANDS ---
+	// --- COMMANDS & PLAYERS ---
 	{
 		auto font = rm.LoadFont("Lingua.otf", 12);
 		auto go = std::make_unique<dae::GameObject>();
@@ -145,9 +89,14 @@ static void load()
 		text2->SetColor({ 255, 255, 0, 255 });
 		scene.Add(std::move(go2));
 
+		// ====================== PENGO (with State Pattern) ======================
 		auto pPlayer1Obj = std::make_unique<dae::GameObject>();
 		pPlayer1Obj->SetLocalPosition(100.f, 300.f);
-		pPlayer1Obj->AddComponent<dae::RenderComponent>()->SetTexture("pengo.png");
+		pPlayer1Obj->AddComponent<dae::RenderComponent>();   // no SetTexture - Pengo will handle it via spritesheet
+
+		// Keep Pengo alive for the whole game
+		static std::unique_ptr<Pengo> pPlayer1Pengo = std::make_unique<Pengo>(pPlayer1Obj.get());
+
 		dae::GameObject* pPlayer1 = pPlayer1Obj.get();
 		scene.Add(std::move(pPlayer1Obj));
 
@@ -180,6 +129,7 @@ static void load()
 					pointsDisplay->OnPointsScored(points->GetPoints());
 			});
 
+		// ====================== SNO-BEE (unchanged) ======================
 		auto pPlayer2Obj = std::make_unique<dae::GameObject>();
 		pPlayer2Obj->SetLocalPosition(200.f, 300.f);
 		pPlayer2Obj->AddComponent<dae::RenderComponent>()->SetTexture("sno-bee.png");
@@ -216,16 +166,17 @@ static void load()
 					pointsDisplay2->OnPointsScored(points2->GetPoints());
 			});
 
+		// ====================== INPUT BINDINGS (unchanged) ======================
 		auto& input = dae::InputManager::GetInstance();
 		float speedP1 = 100.f;
 		float speedP2 = 200.f;
 
 		auto& soundSys = dae::ServiceLocator::GetSoundSystem();
-		#if __EMSCRIPTEN__
-			soundSys.LoadSound(0, "/Data/Miss.mp3");
-		#else
-			soundSys.LoadSound(0, "Data/Miss.mp3");
-		#endif
+#if __EMSCRIPTEN__
+		soundSys.LoadSound(0, "/Data/Miss.mp3");
+#else
+		soundSys.LoadSound(0, "Data/Miss.mp3");
+#endif
 
 		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
 			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, speedP1));
@@ -254,10 +205,16 @@ static void load()
 			std::make_unique<dae::DieCommand>(pPlayer2));
 		input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Pressed,
 			std::make_unique<dae::AddPointsCommand>(pPlayer2, 100));
+
+		// TODO (later): Call these every frame for full state behavior
+		// pPlayer1Pengo->HandleInput(deltaTime);
+		// pPlayer1Pengo->Update(deltaTime);
 	}
+
+	// You can call pPlayer1Pengo->HandleInput / Update from here once you add a proper game loop hook
 }
 
-int main(int, char*[]) {
+int main(int, char* []) {
 #if __EMSCRIPTEN__
 	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR);
 #endif
@@ -270,5 +227,5 @@ int main(int, char*[]) {
 #endif
 	dae::Minigin engine(data_location);
 	engine.Run(load);
-    return 0;
+	return 0;
 }

@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include "Component.h"
+#include <SDL3/SDL.h>
 
 namespace dae
 {
@@ -16,7 +17,10 @@ namespace dae
 		void SetTexture(const std::string& filename);
 		void SetTexture(std::shared_ptr<Texture2D> texture);
 
+		void SetSourceRect(const SDL_Rect& rect);
+
 	private:
 		std::shared_ptr<Texture2D> m_texture{};
+		SDL_Rect m_sourceRect{ 0, 0, 0, 0 };
 	};
 }

@@ -11,6 +11,11 @@ endif()
 
 add_executable(${TARGET_NAME} ${TARGET_PARAM}
     Main.cpp
+    Pengo.cpp
+    States/StandingState.cpp
+    States/WalkingState.cpp
+    States/PushingState.cpp
+    States/DyingState.cpp
 )
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
