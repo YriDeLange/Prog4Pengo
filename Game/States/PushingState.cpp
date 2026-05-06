@@ -5,7 +5,7 @@
 
 void PushingState::OnEnter()
 {
-    _pengo->SetSpriteFrame(2);
+    m_pPengo->SetSpriteFrame(2);
 }
 
 std::unique_ptr<PengoState> PushingState::HandleInput(float dt)
@@ -14,7 +14,7 @@ std::unique_ptr<PengoState> PushingState::HandleInput(float dt)
     bool pushing = keyboard[SDL_SCANCODE_SPACE];
 
     if (!pushing)
-        return std::make_unique<WalkingState>(_pengo);
+        return std::make_unique<WalkingState>(m_pPengo);
 
     return nullptr;
 }

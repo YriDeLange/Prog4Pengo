@@ -6,10 +6,10 @@ class Pengo;
 class PengoState
 {
 protected:
-    Pengo* _pengo;
+    Pengo* m_pPengo;
 
 public:
-    explicit PengoState(Pengo* pengo) : _pengo(pengo) {}
+    explicit PengoState(Pengo* pengo) : m_pPengo(pengo) {}
     virtual ~PengoState() = default;
 
     virtual void OnEnter() = 0;

@@ -5,7 +5,7 @@
 
 void WalkingState::OnEnter()
 {
-    _pengo->SetSpriteFrame(_pengo->GetDirection(), 0);
+    m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
 std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
@@ -23,15 +23,15 @@ std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
         dir.x = 1.0f;
 
     const float speed = 150.0f;
-    _pengo->SetVelocity(dir * speed);
+    m_pPengo->SetVelocity(dir * speed);
 
-    if (dir.x < 0) _pengo->SetDirection(PengoDirection::Left);
-    else if (dir.x > 0) _pengo->SetDirection(PengoDirection::Right);
-    else if (dir.y < 0) _pengo->SetDirection(PengoDirection::Up);
-    else if (dir.y > 0) _pengo->SetDirection(PengoDirection::Down);
+    if (dir.x < 0) m_pPengo->SetDirection(PengoDirection::Left);
+    else if (dir.x > 0) m_pPengo->SetDirection(PengoDirection::Right);
+    else if (dir.y < 0) m_pPengo->SetDirection(PengoDirection::Up);
+    else if (dir.y > 0) m_pPengo->SetDirection(PengoDirection::Down);
 
     if (dir.x == 0.0f && dir.y == 0.0f)
-        return std::make_unique<StandingState>(_pengo);
+        return std::make_unique<StandingState>(m_pPengo);
 
     return nullptr;
 }
@@ -42,5 +42,5 @@ void WalkingState::Update(float dt)
     timer += dt;
     int frame = (static_cast<int>(timer * 8.0f) % 2);
 
-    _pengo->SetSpriteFrame(_pengo->GetDirection(), frame);
+    m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), frame);
 }

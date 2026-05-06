@@ -95,9 +95,8 @@ static void load()
 
 		pPlayer1Obj->AddComponent<dae::PengoComponent>();
 
-		pPlayer1Obj->AddComponent<dae::RenderComponent>();   // no SetTexture - Pengo will handle it via spritesheet
+		pPlayer1Obj->AddComponent<dae::RenderComponent>();
 
-		// Keep Pengo alive for the whole game
 		static std::unique_ptr<Pengo> pPlayer1Pengo = std::make_unique<Pengo>(pPlayer1Obj.get());
 
 		dae::GameObject* pPlayer1 = pPlayer1Obj.get();

@@ -3,7 +3,7 @@
 
 void DyingState::OnEnter()
 {
-    _pengo->SetSpriteFrame(3);
+    m_pPengo->SetSpriteFrame(3);
 }
 
 std::unique_ptr<PengoState> DyingState::HandleInput(float dt)

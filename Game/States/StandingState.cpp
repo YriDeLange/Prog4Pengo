@@ -5,7 +5,7 @@
 
 void StandingState::OnEnter()
 {
-    _pengo->SetSpriteFrame(PengoDirection::Down, 0);
+    m_pPengo->SetSpriteFrame(PengoDirection::Down, 0);
 }
 
 std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
@@ -15,7 +15,7 @@ std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
         keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_S];
 
     if (moving)
-        return std::make_unique<WalkingState>(_pengo);
+        return std::make_unique<WalkingState>(m_pPengo);
 
     return nullptr;
 }

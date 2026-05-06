@@ -3,55 +3,55 @@
 #include "RenderComponent.h"
 
 Pengo::Pengo(dae::GameObject* owner)
-    : _owner(owner)
+    : m_owner(owner)
 {
-    _currentState = std::make_unique<StandingState>(this);
-    _currentState->OnEnter();
+    m_currentState = std::make_unique<StandingState>(this);
+    m_currentState->OnEnter();
 }
 
 Pengo::~Pengo()
 {
-    if (_currentState)
+    if (m_currentState)
     {
-        _currentState->OnExit();
+        m_currentState->OnExit();
     }
 }
 
 void Pengo::SetState(std::unique_ptr<PengoState> state)
 {
-    if (_currentState)
+    if (m_currentState)
     {
-        _currentState->OnExit();
+        m_currentState->OnExit();
     }
 
-    _currentState = std::move(state);
+    m_currentState = std::move(state);
 
-    if (_currentState)
+    if (m_currentState)
     {
-        _currentState->OnEnter();
+        m_currentState->OnEnter();
     }
 }
 
 void Pengo::HandleInput(float dt)
 {
-    if (_currentState)
+    if (m_currentState)
     {
-        auto newState = _currentState->HandleInput(dt);
+        auto newState = m_currentState->HandleInput(dt);
         if (newState) SetState(std::move(newState));
     }
 }
 
 void Pengo::Update(float dt)
 {
-    if (_currentState)
-        _currentState->Update(dt);
+    if (m_currentState)
+        m_currentState->Update(dt);
 
     if (m_velocity.x != 0.0f || m_velocity.y != 0.0f)
     {
-        glm::vec3 pos = _owner->GetLocalPosition();
+        glm::vec3 pos = m_owner->GetLocalPosition();
         pos.x += m_velocity.x * dt;
         pos.y += m_velocity.y * dt;
-        _owner->SetLocalPosition(pos);
+        m_owner->SetLocalPosition(pos);
     }
 
     m_velocity = { 0.0f, 0.0f };
@@ -60,17 +60,17 @@ void Pengo::Update(float dt)
 // ====================== SPRITESHEET ======================
 void Pengo::SetDirection(PengoDirection dir)
 {
-    _direction = dir;
+    m_direction = dir;
 }
 
 void Pengo::SetSpriteFrame(int frameIndex)
 {
-    SetSpriteFrame(_direction, frameIndex);
+    SetSpriteFrame(m_direction, frameIndex);
 }
 
 void Pengo::SetSpriteFrame(PengoDirection dir, int frame)
 {
-    if (auto* render = _owner->GetComponent<dae::RenderComponent>())
+    if (auto* render = m_owner->GetComponent<dae::RenderComponent>())
     {
         render->SetTexture(SPRITESHEET);
 
