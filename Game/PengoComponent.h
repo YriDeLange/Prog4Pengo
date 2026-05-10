@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include <memory>
+#include <string>
 
 class Pengo;
 
@@ -9,7 +10,7 @@ namespace dae
     class PengoComponent final : public Component
     {
     public:
-        explicit PengoComponent(GameObject* pOwner);
+        explicit PengoComponent(GameObject* pOwner, bool IsPlayer1);
         ~PengoComponent() override;
 
         void Update(float deltaTime) override;

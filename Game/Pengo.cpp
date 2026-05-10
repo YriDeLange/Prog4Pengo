@@ -2,8 +2,9 @@
 #include "States/StandingState.h"
 #include "RenderComponent.h"
 
-Pengo::Pengo(dae::GameObject* owner)
+Pengo::Pengo(dae::GameObject* owner, bool IsPlayer1)
     : m_owner(owner)
+    , IsPlayer1(IsPlayer1)
 {
     m_currentState = std::make_unique<StandingState>(this);
     m_currentState->OnEnter();
@@ -17,27 +18,17 @@ Pengo::~Pengo()
     }
 }
 
-void Pengo::SetState(std::unique_ptr<PengoState> state)
-{
-    if (m_currentState)
-    {
-        m_currentState->OnExit();
-    }
-
-    m_currentState = std::move(state);
-
-    if (m_currentState)
-    {
-        m_currentState->OnEnter();
-    }
-}
-
 void Pengo::HandleInput(float dt)
 {
     if (m_currentState)
     {
         auto newState = m_currentState->HandleInput(dt);
-        if (newState) SetState(std::move(newState));
+        if (newState)
+        {
+            m_currentState->OnExit();
+            m_currentState = std::move(newState);
+            m_currentState->OnEnter();
+        }
     }
 }
 
@@ -54,7 +45,37 @@ void Pengo::Update(float dt)
         m_owner->SetLocalPosition(pos);
     }
 
-    m_velocity = { 0.0f, 0.0f };
+    m_velocity = m_inputDirection * MOVE_SPEED;
+}
+
+// ====================== INPUT METHODS (for Command pattern) ======================
+void Pengo::MoveUp()
+{
+    m_inputDirection = { 0.0f, -1.0f };
+    SetDirection(PengoDirection::Up);
+}
+
+void Pengo::MoveDown()
+{
+    m_inputDirection = { 0.0f, 1.0f };
+    SetDirection(PengoDirection::Down);
+}
+
+void Pengo::MoveLeft()
+{
+    m_inputDirection = { -1.0f, 0.0f };
+    SetDirection(PengoDirection::Left);
+}
+
+void Pengo::MoveRight()
+{
+    m_inputDirection = { 1.0f, 0.0f };
+    SetDirection(PengoDirection::Right);
+}
+
+void Pengo::StopMoving()
+{
+    m_inputDirection = { 0.0f, 0.0f };
 }
 
 // ====================== SPRITESHEET ======================
@@ -72,7 +93,15 @@ void Pengo::SetSpriteFrame(PengoDirection dir, int frame)
 {
     if (auto* render = m_owner->GetComponent<dae::RenderComponent>())
     {
-        render->SetTexture(SPRITESHEET);
+        
+        if (IsPlayer1 == true)
+        {
+            render->SetTexture(SPRITESHEET);
+        }
+        else
+        {
+            render->SetTexture(SPRITESHEET2);
+        }
 
         int baseFrame = GetFrameOffsetForDirection(dir);
         int finalFrame = baseFrame + (frame % 2);

@@ -1,9 +1,9 @@
 #include "PengoComponent.h"
 #include "Pengo.h"
 
-dae::PengoComponent::PengoComponent(GameObject* pOwner)
+dae::PengoComponent::PengoComponent(GameObject* pOwner, bool IsPlayer1)
     : Component(pOwner)
-    , m_pPengo(std::make_unique<Pengo>(pOwner))
+    , m_pPengo(std::make_unique<Pengo>(pOwner, IsPlayer1))
 {
 }
 

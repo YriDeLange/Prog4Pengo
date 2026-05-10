@@ -1,23 +1,24 @@
 #include "StandingState.h"
 #include "../Pengo.h"
 #include "WalkingState.h"
-#include <SDL3/SDL.h>
 
 void StandingState::OnEnter()
 {
-    m_pPengo->SetSpriteFrame(PengoDirection::Down, 0);
+    m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
 std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
 {
-    auto keyboard = SDL_GetKeyboardState(nullptr);
-    bool moving = keyboard[SDL_SCANCODE_A] || keyboard[SDL_SCANCODE_D] ||
-        keyboard[SDL_SCANCODE_W] || keyboard[SDL_SCANCODE_S];
-
-    if (moving)
+    // Check if Pengo is receiving movement input (via commands)
+    if (m_pPengo->GetVelocity().x != 0.0f || m_pPengo->GetVelocity().y != 0.0f)
+    {
         return std::make_unique<WalkingState>(m_pPengo);
+    }
 
-    return nullptr;
+    return nullptr; // Stay in standing state
 }
 
-void StandingState::Update(float dt) {}
+void StandingState::Update(float dt)
+{
+    // Nothing to do while standing
+}

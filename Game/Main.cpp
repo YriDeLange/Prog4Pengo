@@ -29,7 +29,7 @@
 #include "PointsDisplayComponent.h"
 #include "PengoComponent.h"
 
-// NEW: Pengo + State Pattern
+// Pengo + State Pattern
 #include "Pengo.h"
 
 #if USE_STEAMWORKS
@@ -93,11 +93,8 @@ static void load()
 		auto pPlayer1Obj = std::make_unique<dae::GameObject>();
 		pPlayer1Obj->SetLocalPosition(100.f, 300.f);
 
-		pPlayer1Obj->AddComponent<dae::PengoComponent>();
-
+		pPlayer1Obj->AddComponent<dae::PengoComponent>(true);
 		pPlayer1Obj->AddComponent<dae::RenderComponent>();
-
-		static std::unique_ptr<Pengo> pPlayer1Pengo = std::make_unique<Pengo>(pPlayer1Obj.get());
 
 		dae::GameObject* pPlayer1 = pPlayer1Obj.get();
 		scene.Add(std::move(pPlayer1Obj));
@@ -131,27 +128,30 @@ static void load()
 					pointsDisplay->OnPointsScored(points->GetPoints());
 			});
 
-		// ====================== SNO-BEE (unchanged) ======================
+		// ====================== PENGO 2 ======================
 		auto pPlayer2Obj = std::make_unique<dae::GameObject>();
 		pPlayer2Obj->SetLocalPosition(200.f, 300.f);
-		pPlayer2Obj->AddComponent<dae::RenderComponent>()->SetTexture("sno-bee.png");
+
+		pPlayer2Obj->AddComponent<dae::PengoComponent>(false);
+		pPlayer2Obj->AddComponent<dae::RenderComponent>();
+
 		dae::GameObject* pPlayer2 = pPlayer2Obj.get();
 		scene.Add(std::move(pPlayer2Obj));
 
 		auto* health2 = pPlayer2->AddComponent<dae::HealthComponent>(3);
 		auto* points2 = pPlayer2->AddComponent<dae::PointsComponent>();
 
-		auto livesDisplay2Obj = std::make_unique<dae::GameObject>();
-		livesDisplay2Obj->SetLocalPosition(5.f, 25.f);
-		auto* livesDisplay2 = livesDisplay2Obj->AddComponent<dae::LivesDisplayComponent>(3, "PengoLife.png");
-		scene.Add(std::move(livesDisplay2Obj));
+		auto livesDisplayObj2 = std::make_unique<dae::GameObject>();
+		livesDisplayObj2->SetLocalPosition(5.f, 25.f);
+		auto* livesDisplay2 = livesDisplayObj2->AddComponent<dae::LivesDisplayComponent>(3, "PengoLife.png");
+		scene.Add(std::move(livesDisplayObj2));
 
-		auto pointsDisplay2Obj = std::make_unique<dae::GameObject>();
-		pointsDisplay2Obj->SetLocalPosition(65.f, 25.f);
-		pointsDisplay2Obj->AddComponent<dae::RenderComponent>();
-		pointsDisplay2Obj->AddComponent<dae::TextComponent>("0", font);
-		auto* pointsDisplay2 = pointsDisplay2Obj->AddComponent<dae::PointsDisplayComponent>();
-		scene.Add(std::move(pointsDisplay2Obj));
+		auto pointsDisplayObj2 = std::make_unique<dae::GameObject>();
+		pointsDisplayObj2->SetLocalPosition(65.f, 25.f);
+		pointsDisplayObj2->AddComponent<dae::RenderComponent>();
+		pointsDisplayObj2->AddComponent<dae::TextComponent>("0", font);
+		auto* pointsDisplay2 = pointsDisplayObj2->AddComponent<dae::PointsDisplayComponent>();
+		scene.Add(std::move(pointsDisplayObj2));
 
 		health2->AddObserver([livesDisplay2](unsigned int eventId)
 			{
@@ -161,17 +161,14 @@ static void load()
 					dae::ServiceLocator::GetSoundSystem().Play(0, 1.0f);
 				}
 			});
-
 		points2->AddObserver([pointsDisplay2, points2](unsigned int eventId)
 			{
 				if (eventId == GameEvent::EnemyDied)
 					pointsDisplay2->OnPointsScored(points2->GetPoints());
 			});
 
-		// ====================== INPUT BINDINGS (unchanged) ======================
+		// ====================== INPUT BINDINGS ======================
 		auto& input = dae::InputManager::GetInstance();
-		float speedP1 = 100.f;
-		float speedP2 = 200.f;
 
 		auto& soundSys = dae::ServiceLocator::GetSoundSystem();
 #if __EMSCRIPTEN__
@@ -179,19 +176,51 @@ static void load()
 #else
 		soundSys.LoadSound(0, "Data/Miss.mp3");
 #endif
+
+		// PENGO keyboard bindings - MoveCommand works with Pengo automatically!
+		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, -1 }, 0.f));
+		input.BindKeyboardCommand(SDL_SCANCODE_S, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 0, 1 }, 0.f));
+		input.BindKeyboardCommand(SDL_SCANCODE_A, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ -1, 0 }, 0.f));
+		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Pressed,
+			std::make_unique<dae::MoveCommand>(pPlayer1, glm::vec2{ 1, 0 }, 0.f));
+
+		// Stop commands when keys are released
+		input.BindKeyboardCommand(SDL_SCANCODE_W, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer1));
+		input.BindKeyboardCommand(SDL_SCANCODE_S, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer1));
+		input.BindKeyboardCommand(SDL_SCANCODE_A, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer1));
+		input.BindKeyboardCommand(SDL_SCANCODE_D, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer1));
+
 		input.BindKeyboardCommand(SDL_SCANCODE_X, dae::KeyState::Pressed,
 			std::make_unique<dae::DieCommand>(pPlayer1));
 		input.BindKeyboardCommand(SDL_SCANCODE_C, dae::KeyState::Pressed,
 			std::make_unique<dae::AddPointsCommand>(pPlayer1, 100));
 
+		// Pengo 2 controller bindings - MoveCommand uses original behavior
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0, -1 }, speedP2));
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0, -1 }, 0.f));
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0,  1 }, speedP2));
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 0, 1 }, 0.f));
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadLeft, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ -1, 0 }, speedP2));
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ -1, 0 }, 0.f));
 		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Pressed,
-			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, speedP2));
+			std::make_unique<dae::MoveCommand>(pPlayer2, glm::vec2{ 1, 0 }, 0.f));
+
+		// Stop commands when keys are released
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadLeft, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer2));
+		input.BindControllerCommand(0, dae::Gamepad::Button::DpadRight, dae::KeyState::Up,
+			std::make_unique<dae::StopMoveCommand>(pPlayer2));
 
 		input.BindControllerCommand(0, dae::Gamepad::Button::X, dae::KeyState::Pressed,
 			std::make_unique<dae::DieCommand>(pPlayer2));

@@ -20,13 +20,18 @@ enum class PengoDirection
 class Pengo
 {
 public:
-    explicit Pengo(dae::GameObject* owner);
+    explicit Pengo(dae::GameObject* owner, bool IsPlayer1);
     ~Pengo();
-
-    void SetState(std::unique_ptr<PengoState> state);
 
     void HandleInput(float dt);
     void Update(float dt);
+
+    // Input methods for Command pattern
+    void MoveUp();
+    void MoveDown();
+    void MoveLeft();
+    void MoveRight();
+    void StopMoving();
 
     void SetDirection(PengoDirection dir);
     PengoDirection GetDirection() const { return m_direction; }
@@ -46,5 +51,9 @@ private:
     static constexpr int FRAME_WIDTH = 16;
     static constexpr int FRAME_HEIGHT = 16;
     static constexpr const char* SPRITESHEET = "Pengo_Spritesheet.png";
+    static constexpr const char* SPRITESHEET2 = "Pengo2_Spritesheet.png";
     glm::vec2 m_velocity{ 0.0f, 0.0f };
+    glm::vec2 m_inputDirection{ 0.0f, 0.0f };
+    static constexpr float MOVE_SPEED = 150.0f;
+    bool IsPlayer1{};
 };
