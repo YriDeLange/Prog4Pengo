@@ -26,7 +26,6 @@ public:
     void HandleInput(float dt);
     void Update(float dt);
 
-    // Input methods for Command pattern
     void MoveUp();
     void MoveDown();
     void MoveLeft();
@@ -37,6 +36,7 @@ public:
     PengoDirection GetDirection() const { return m_direction; }
     void SetSpriteFrame(int frameIndex);
     void SetSpriteFrame(PengoDirection dir, int frame = 0);
+    void SetDeathFrame(int frame);          // ← NEW
     int GetFrameOffsetForDirection(PengoDirection dir) const;
     void SetVelocity(const glm::vec2& velocity);
     const glm::vec2& GetVelocity() const { return m_velocity; }

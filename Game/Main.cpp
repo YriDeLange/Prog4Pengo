@@ -89,18 +89,18 @@ static void load()
 		text2->SetColor({ 255, 255, 0, 255 });
 		scene.Add(std::move(go2));
 
-		// ====================== PENGO (with State Pattern) ======================
+		// ====================== PENGO ======================
 		auto pPlayer1Obj = std::make_unique<dae::GameObject>();
 		pPlayer1Obj->SetLocalPosition(100.f, 300.f);
+
+		auto* health = pPlayer1Obj->AddComponent<dae::HealthComponent>(3);
+		auto* points = pPlayer1Obj->AddComponent<dae::PointsComponent>();
 
 		pPlayer1Obj->AddComponent<dae::PengoComponent>(true);
 		pPlayer1Obj->AddComponent<dae::RenderComponent>();
 
 		dae::GameObject* pPlayer1 = pPlayer1Obj.get();
 		scene.Add(std::move(pPlayer1Obj));
-
-		auto* health = pPlayer1->AddComponent<dae::HealthComponent>(3);
-		auto* points = pPlayer1->AddComponent<dae::PointsComponent>();
 
 		auto livesDisplayObj = std::make_unique<dae::GameObject>();
 		livesDisplayObj->SetLocalPosition(5.f, 5.f);
@@ -132,14 +132,14 @@ static void load()
 		auto pPlayer2Obj = std::make_unique<dae::GameObject>();
 		pPlayer2Obj->SetLocalPosition(200.f, 300.f);
 
+		auto* health2 = pPlayer2Obj->AddComponent<dae::HealthComponent>(3);
+		auto* points2 = pPlayer2Obj->AddComponent<dae::PointsComponent>();
+
 		pPlayer2Obj->AddComponent<dae::PengoComponent>(false);
 		pPlayer2Obj->AddComponent<dae::RenderComponent>();
 
 		dae::GameObject* pPlayer2 = pPlayer2Obj.get();
 		scene.Add(std::move(pPlayer2Obj));
-
-		auto* health2 = pPlayer2->AddComponent<dae::HealthComponent>(3);
-		auto* points2 = pPlayer2->AddComponent<dae::PointsComponent>();
 
 		auto livesDisplayObj2 = std::make_unique<dae::GameObject>();
 		livesDisplayObj2->SetLocalPosition(5.f, 25.f);

@@ -9,13 +9,12 @@ void WalkingState::OnEnter()
 
 std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
 {
-    // Check if Pengo stopped moving (no input from commands)
     if (m_pPengo->GetVelocity().x == 0.0f && m_pPengo->GetVelocity().y == 0.0f)
     {
         return std::make_unique<StandingState>(m_pPengo);
     }
 
-    return nullptr; // Stay in walking state
+    return nullptr;
 }
 
 void WalkingState::Update(float dt)

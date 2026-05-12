@@ -1,6 +1,9 @@
 #include "Pengo.h"
 #include "States/StandingState.h"
 #include "RenderComponent.h"
+#include "HealthComponent.h"
+#include "GameEvents.h"
+#include "States/DyingState.h"
 
 Pengo::Pengo(dae::GameObject* owner, bool IsPlayer1)
     : m_owner(owner)
@@ -8,6 +11,22 @@ Pengo::Pengo(dae::GameObject* owner, bool IsPlayer1)
 {
     m_currentState = std::make_unique<StandingState>(this);
     m_currentState->OnEnter();
+
+    if (auto* health = m_owner->GetComponent<dae::HealthComponent>())
+    {
+        health->AddObserver([this](unsigned int eventId)
+            {
+                if (eventId == GameEvent::PlayerDied)
+                {
+                    if (m_currentState)
+                    {
+                        m_currentState->OnExit();
+                    }
+                    m_currentState = std::make_unique<DyingState>(this);
+                    m_currentState->OnEnter();
+                }
+            });
+    }
 }
 
 Pengo::~Pengo()
@@ -109,6 +128,25 @@ void Pengo::SetSpriteFrame(PengoDirection dir, int frame)
         SDL_Rect src{};
         src.x = finalFrame * FRAME_WIDTH;
         src.y = 0;
+        src.w = FRAME_WIDTH;
+        src.h = FRAME_HEIGHT;
+
+        render->SetSourceRect(src);
+    }
+}
+
+void Pengo::SetDeathFrame(int frame)
+{
+    if (auto* render = m_owner->GetComponent<dae::RenderComponent>())
+    {
+        if (IsPlayer1)
+            render->SetTexture(SPRITESHEET);
+        else
+            render->SetTexture(SPRITESHEET2);
+
+        SDL_Rect src{};
+        src.x = (frame % 2) * FRAME_WIDTH;
+        src.y = 32;
         src.w = FRAME_WIDTH;
         src.h = FRAME_HEIGHT;
 

@@ -4,6 +4,7 @@
 
 void StandingState::OnEnter()
 {
+    m_pPengo->SetVelocity({ 0.0f, 0.0f });
     m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
@@ -15,10 +16,10 @@ std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
         return std::make_unique<WalkingState>(m_pPengo);
     }
 
-    return nullptr; // Stay in standing state
+    return nullptr;
 }
 
 void StandingState::Update(float dt)
 {
-    // Nothing to do while standing
+    
 }
