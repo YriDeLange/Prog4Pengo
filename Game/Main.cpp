@@ -29,8 +29,8 @@
 #include "PointsDisplayComponent.h"
 #include "PengoComponent.h"
 
-// Pengo + State Pattern
 #include "Pengo.h"
+#include "LevelGrid.h"
 
 #if USE_STEAMWORKS
 #include "SteamAchievements.h"
@@ -59,6 +59,8 @@ static void load()
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene();
 	auto& rm = dae::ResourceManager::GetInstance();
+
+	dae::LevelGrid::GetInstance().Init(32, 32, 16);
 
 	// --- FPS counter (top-left) ---
 	{

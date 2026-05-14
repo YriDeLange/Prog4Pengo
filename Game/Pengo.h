@@ -56,4 +56,11 @@ private:
     glm::vec2 m_inputDirection{ 0.0f, 0.0f };
     static constexpr float MOVE_SPEED = 150.0f;
     bool IsPlayer1{};
+
+    glm::ivec2 m_currentGridPos{ 0, 0 };
+    glm::ivec2 m_targetGridPos{ 0, 0 };
+    bool m_isMovingToTarget = false;
+
+    void UpdateGridMovement(float dt);
+    void StartMovingToGrid(int gridX, int gridY);
 };

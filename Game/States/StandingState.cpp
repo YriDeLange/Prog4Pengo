@@ -5,6 +5,7 @@
 void StandingState::OnEnter()
 {
     m_pPengo->SetVelocity({ 0.0f, 0.0f });
+    m_pPengo->StopMoving();
     m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
