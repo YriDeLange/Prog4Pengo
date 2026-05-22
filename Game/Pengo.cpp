@@ -5,11 +5,17 @@
 #include "GameEvents.h"
 #include "States/DyingState.h"
 #include "LevelGrid.h"
+#include "IceBlock.h"
 
 Pengo::Pengo(dae::GameObject* owner, bool IsPlayer1)
     : m_owner(owner)
     , IsPlayer1(IsPlayer1)
 {
+    // Sync grid position from the world position set before this component was added
+    glm::vec3 worldPos = m_owner->GetLocalPosition();
+    m_currentGridPos = dae::LevelGrid::GetInstance().WorldToGrid(worldPos.x, worldPos.y);
+    m_targetGridPos = m_currentGridPos;
+
     m_currentState = std::make_unique<StandingState>(this);
     m_currentState->OnEnter();
 
@@ -63,44 +69,72 @@ void Pengo::Update(float dt)
 // ====================== INPUT METHODS (for Command pattern) ======================
 void Pengo::MoveUp()
 {
-    if (m_isMovingToTarget) return;
-
-    m_inputDirection = { 0.0f, -1.0f };
+    if (m_isMovingToTarget || m_isPushing || m_movementLocked) return;
     SetDirection(PengoDirection::Up);
+    m_inputDirection = { 0.0f, -1.0f };
     StartMovingToGrid(m_currentGridPos.x, m_currentGridPos.y - 1);
 }
 
 void Pengo::MoveDown()
 {
-    if (m_isMovingToTarget) return;
-
-    m_inputDirection = { 0.0f, 1.0f };
+    if (m_isMovingToTarget || m_isPushing || m_movementLocked) return;
     SetDirection(PengoDirection::Down);
+    m_inputDirection = { 0.0f, 1.0f };
     StartMovingToGrid(m_currentGridPos.x, m_currentGridPos.y + 1);
 }
 
 void Pengo::MoveLeft()
 {
-    if (m_isMovingToTarget) return;
-
-    m_inputDirection = { -1.0f, 0.0f };
+    if (m_isMovingToTarget || m_isPushing || m_movementLocked) return;
     SetDirection(PengoDirection::Left);
+    m_inputDirection = { -1.0f, 0.0f };
     StartMovingToGrid(m_currentGridPos.x - 1, m_currentGridPos.y);
 }
 
 void Pengo::MoveRight()
 {
-    if (m_isMovingToTarget) return;
-
-    m_inputDirection = { 1.0f, 0.0f };
+    if (m_isMovingToTarget || m_isPushing || m_movementLocked) return;
     SetDirection(PengoDirection::Right);
+    m_inputDirection = { 1.0f, 0.0f };
     StartMovingToGrid(m_currentGridPos.x + 1, m_currentGridPos.y);
+}
+
+void Pengo::TryPush()
+{
+    if (m_isPushing || m_isMovingToTarget || m_movementLocked) return;
+
+    glm::ivec2 front = m_currentGridPos;
+    switch (m_direction)
+    {
+    case PengoDirection::Up:    front.y -= 1; break;
+    case PengoDirection::Down:  front.y += 1; break;
+    case PengoDirection::Left:  front.x -= 1; break;
+    case PengoDirection::Right: front.x += 1; break;
+    }
+
+    auto* block = dae::LevelGrid::GetInstance().GetBlockAt(front.x, front.y);
+    if (!block) return;
+
+    glm::ivec2 pushDir = front - m_currentGridPos;
+    m_isPushing = block->TryPush(pushDir);
+    m_pushedBlock = m_isPushing ? block : nullptr;
 }
 
 void Pengo::StopMoving()
 {
     m_inputDirection = { 0.0f, 0.0f };
     m_velocity = { 0.0f, 0.0f };
+}
+
+void Pengo::LockMovement()
+{
+    m_movementLocked = true;
+    m_isMovingToTarget = false;
+    m_inputDirection = { 0.0f, 0.0f };
+    m_velocity = { 0.0f, 0.0f };
+    // Snap to the committed grid position to avoid being stuck mid-cell
+    glm::vec2 snapped = dae::LevelGrid::GetInstance().GridToWorld(m_currentGridPos.x, m_currentGridPos.y);
+    m_owner->SetLocalPosition(snapped.x, snapped.y, 0.0f);
 }
 
 // ====================== SPRITESHEET ======================
@@ -153,6 +187,27 @@ void Pengo::SetDeathFrame(int frame)
         SDL_Rect src{};
         src.x = (frame % 2) * FRAME_WIDTH;
         src.y = 32;
+        src.w = FRAME_WIDTH;
+        src.h = FRAME_HEIGHT;
+
+        render->SetSourceRect(src);
+    }
+}
+
+void Pengo::SetPushFrame(int frame)
+{
+    if (auto* render = m_owner->GetComponent<dae::RenderComponent>())
+    {
+        if (IsPlayer1)
+            render->SetTexture(SPRITESHEET);
+        else
+            render->SetTexture(SPRITESHEET2);
+
+        int baseFrame = GetFrameOffsetForDirection(m_direction);
+
+        SDL_Rect src{};
+        src.x = (baseFrame + (frame % 2)) * FRAME_WIDTH;
+        src.y = 16;
         src.w = FRAME_WIDTH;
         src.h = FRAME_HEIGHT;
 

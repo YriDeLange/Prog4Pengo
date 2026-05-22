@@ -1,6 +1,7 @@
 #include "WalkingState.h"
 #include "../Pengo.h"
 #include "StandingState.h"
+#include "PushingState.h"
 
 void WalkingState::OnEnter()
 {
@@ -9,10 +10,12 @@ void WalkingState::OnEnter()
 
 std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
 {
-    if (m_pPengo->GetVelocity().x == 0.0f && m_pPengo->GetVelocity().y == 0.0f)
-    {
+    if (m_pPengo->IsPushing())
+        return std::make_unique<PushingState>(m_pPengo);
+
+    const auto& dir = m_pPengo->GetInputDirection();
+    if (dir.x == 0.0f && dir.y == 0.0f)
         return std::make_unique<StandingState>(m_pPengo);
-    }
 
     return nullptr;
 }

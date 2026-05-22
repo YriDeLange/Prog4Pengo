@@ -10,7 +10,7 @@ namespace dae
     class LevelGrid final : public Singleton<LevelGrid>
     {
     public:
-        void Init(int width, int height, int cellSize = 16);
+        void Init(int width, int height, int cellSize = 16, float offsetX = 0.f, float offsetY = 0.f);
         void Clear();
 
         glm::vec2 GridToWorld(int gridX, int gridY) const;
@@ -28,6 +28,8 @@ namespace dae
         int GetWidth() const { return m_width; }
         int GetHeight() const { return m_height; }
         int GetCellSize() const { return m_cellSize; }
+        float GetOffsetX() const { return m_offsetX; }
+        float GetOffsetY() const { return m_offsetY; }
 
     private:
         friend class Singleton<LevelGrid>;
@@ -36,6 +38,8 @@ namespace dae
         int m_width = 0;
         int m_height = 0;
         int m_cellSize = 16;
+        float m_offsetX = 0.f;
+        float m_offsetY = 0.f;
         std::vector<std::vector<IceBlock*>> m_grid;
     };
 }

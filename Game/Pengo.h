@@ -9,6 +9,8 @@ namespace dae
     class RenderComponent;
 }
 
+namespace dae { class IceBlock; }
+
 enum class PengoDirection
 {
     Down = 0,
@@ -31,15 +33,24 @@ public:
     void MoveLeft();
     void MoveRight();
     void StopMoving();
+    void TryPush(); // push the block in the current facing direction
 
     void SetDirection(PengoDirection dir);
     PengoDirection GetDirection() const { return m_direction; }
     void SetSpriteFrame(int frameIndex);
     void SetSpriteFrame(PengoDirection dir, int frame = 0);
-    void SetDeathFrame(int frame);          // ← NEW
+    void SetDeathFrame(int frame);
+    void SetPushFrame(int frame);
     int GetFrameOffsetForDirection(PengoDirection dir) const;
     void SetVelocity(const glm::vec2& velocity);
     const glm::vec2& GetVelocity() const { return m_velocity; }
+    const glm::vec2& GetInputDirection() const { return m_inputDirection; }
+
+    bool IsPushing() const { return m_isPushing; }
+    void ClearPushState() { m_isPushing = false; m_pushedBlock = nullptr; }
+
+    void LockMovement();
+    void UnlockMovement() { m_movementLocked = false; }
 
     dae::GameObject* GetOwner() const { return m_owner; }
 
@@ -60,6 +71,10 @@ private:
     glm::ivec2 m_currentGridPos{ 0, 0 };
     glm::ivec2 m_targetGridPos{ 0, 0 };
     bool m_isMovingToTarget = false;
+
+    bool m_isPushing = false;
+    dae::IceBlock* m_pushedBlock = nullptr;
+    bool m_movementLocked = false;
 
     void UpdateGridMovement(float dt);
     void StartMovingToGrid(int gridX, int gridY);

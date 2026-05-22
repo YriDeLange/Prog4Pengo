@@ -8,6 +8,7 @@ public:
     explicit DyingState(Pengo* pengo) : PengoState(pengo) {}
 
     void OnEnter() override;
+    void OnExit() override;
     std::unique_ptr<PengoState> HandleInput(float dt) override;
     void Update(float dt) override;
 private:

@@ -53,13 +53,31 @@ namespace dae
 
         void Execute(float deltaTime) override
         {
-            // Only works with Pengo objects
             auto* pengoComp = GetGameObject()->GetComponent<PengoComponent>();
             if (pengoComp)
             {
                 auto* pengo = pengoComp->GetPengo();
                 if (pengo)
                     pengo->StopMoving();
+            }
+        }
+    };
+
+    class PushCommand : public GameObjectCommand
+    {
+    public:
+        explicit PushCommand(GameObject* pGO)
+            : GameObjectCommand(pGO) {
+        }
+
+        void Execute(float /*deltaTime*/) override
+        {
+            auto* pengoComp = GetGameObject()->GetComponent<PengoComponent>();
+            if (pengoComp)
+            {
+                auto* pengo = pengoComp->GetPengo();
+                if (pengo)
+                    pengo->TryPush();
             }
         }
     };

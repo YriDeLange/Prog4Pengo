@@ -3,11 +3,13 @@
 
 namespace dae
 {
-    void LevelGrid::Init(int width, int height, int cellSize)
+    void LevelGrid::Init(int width, int height, int cellSize, float offsetX, float offsetY)
     {
         m_width = width;
         m_height = height;
         m_cellSize = cellSize;
+        m_offsetX = offsetX;
+        m_offsetY = offsetY;
 
         m_grid.clear();
         m_grid.resize(height, std::vector<IceBlock*>(width, nullptr));
@@ -22,16 +24,16 @@ namespace dae
     glm::vec2 LevelGrid::GridToWorld(int gridX, int gridY) const
     {
         return glm::vec2(
-            static_cast<float>(gridX * m_cellSize),
-            static_cast<float>(gridY * m_cellSize)
+            m_offsetX + static_cast<float>(gridX * m_cellSize),
+            m_offsetY + static_cast<float>(gridY * m_cellSize)
         );
     }
 
     glm::ivec2 LevelGrid::WorldToGrid(float worldX, float worldY) const
     {
         return glm::ivec2(
-            static_cast<int>(worldX / m_cellSize),
-            static_cast<int>(worldY / m_cellSize)
+            static_cast<int>((worldX - m_offsetX) / m_cellSize),
+            static_cast<int>((worldY - m_offsetY) / m_cellSize)
         );
     }
 

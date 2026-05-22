@@ -14,6 +14,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
     Pengo.cpp
     PengoComponent.cpp
     LevelGrid.cpp
+    IceBlock.cpp
     States/StandingState.cpp
     States/WalkingState.cpp
     States/PushingState.cpp

@@ -4,21 +4,20 @@
 
 void DyingState::OnEnter()
 {
-    m_pPengo->SetVelocity({ 0.0f, 0.0f });
-    m_pPengo->StopMoving();
+    m_pPengo->LockMovement();
     m_timer = 0.0f;
-
     m_pPengo->SetDeathFrame(0);
+}
+
+void DyingState::OnExit()
+{
+    m_pPengo->UnlockMovement();
 }
 
 std::unique_ptr<PengoState> DyingState::HandleInput(float dt)
 {
-    m_pPengo->StopMoving();
-
     if (m_timer >= 3.0f)
-    {
         return std::make_unique<StandingState>(m_pPengo);
-    }
 
     return nullptr;
 }
