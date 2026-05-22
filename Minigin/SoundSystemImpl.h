@@ -14,7 +14,9 @@ namespace dae {
         void LoadSound(sound_id id, const std::string& filePath) override;
 
     private:
+#ifndef __EMSCRIPTEN__
         void Run();
+#endif
 
         struct Impl;
         std::unique_ptr<Impl> m_pImpl;

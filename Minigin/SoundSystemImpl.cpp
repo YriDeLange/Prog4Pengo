@@ -2,11 +2,14 @@
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <iostream>
+#include <unordered_map>
+
+#ifndef __EMSCRIPTEN__
 #include <queue>
 #include <mutex>
 #include <thread>
 #include <condition_variable>
-#include <unordered_map>
+#endif
 
 namespace dae {
 
@@ -22,11 +25,13 @@ namespace dae {
         std::unordered_map<sound_id, MIX_Audio*> m_loadedSounds;
         std::vector<MIX_Track*> m_tracks;
 
+#ifndef __EMSCRIPTEN__
         std::queue<SoundRequest> m_requestQueue;
         std::mutex m_mutex;
         std::condition_variable m_cv;
         std::thread m_thread;
         bool m_running{ true };
+#endif
     };
 
     SoundSystemImpl::SoundSystemImpl()
@@ -53,17 +58,21 @@ namespace dae {
             }
         }
 
+#ifndef __EMSCRIPTEN__
         m_pImpl->m_thread = std::thread(&SoundSystemImpl::Run, this);
+#endif
     }
 
     SoundSystemImpl::~SoundSystemImpl()
     {
+#ifndef __EMSCRIPTEN__
         {
             std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
             m_pImpl->m_running = false;
         }
         m_pImpl->m_cv.notify_one();
         if (m_pImpl->m_thread.joinable()) m_pImpl->m_thread.join();
+#endif
 
         // Clean up tracks first
         for (auto track : m_pImpl->m_tracks) {
@@ -90,14 +99,15 @@ namespace dae {
             return;
         }
 
-        // Load audio
         MIX_Audio* audio = MIX_LoadAudio(m_pImpl->m_mixer, filePath.c_str(), true);
         if (audio == nullptr) {
             std::cerr << "Failed to load " << filePath << ": " << SDL_GetError() << std::endl;
             return;
         }
 
+#ifndef __EMSCRIPTEN__
         std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
+#endif
         auto it = m_pImpl->m_loadedSounds.find(id);
         if (it != m_pImpl->m_loadedSounds.end()) {
             MIX_DestroyAudio(it->second);
@@ -105,6 +115,30 @@ namespace dae {
         m_pImpl->m_loadedSounds[id] = audio;
     }
 
+#ifdef __EMSCRIPTEN__
+    void SoundSystemImpl::Play(sound_id id, float volume)
+    {
+        auto it = m_pImpl->m_loadedSounds.find(id);
+        if (it == m_pImpl->m_loadedSounds.end())
+            return;
+
+        MIX_Audio* audioToPlay = it->second;
+        MIX_Track* chosenTrack = nullptr;
+
+        for (auto track : m_pImpl->m_tracks) {
+            if (track && !MIX_TrackPlaying(track)) {
+                chosenTrack = track;
+                break;
+            }
+        }
+
+        if (audioToPlay && chosenTrack) {
+            MIX_SetTrackAudio(chosenTrack, audioToPlay);
+            MIX_SetTrackGain(chosenTrack, volume);
+            MIX_PlayTrack(chosenTrack, 0);
+        }
+    }
+#else
     void SoundSystemImpl::Play(sound_id id, float volume)
     {
         std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
@@ -153,5 +187,6 @@ namespace dae {
             }
         }
     }
+#endif
 
 }
