@@ -26,7 +26,7 @@ bool dae::InputManager::ProcessInput(float deltaTime)
         switch (state)
         {
         case KeyState::Down:    trigger = current && !previous;  break;
-        case KeyState::Up:      trigger = !current && previous; if (trigger) SDL_Log("UP fired: scancode %d", scancode); break;
+        case KeyState::Up:      trigger = !current && previous; if (trigger) printf("UP fired: scancode %d", scancode); break;
         case KeyState::Pressed: trigger = current;               break;
         }
         if (trigger) command->Execute(deltaTime);
