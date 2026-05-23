@@ -63,9 +63,7 @@ jobs:
           cp build-web/Game/index.js dist/
           cp build-web/Game/index.wasm dist/
           cp build-web/Game/index.data dist/ || true
-          
-          cp "${GITHUB_WORKSPACE}/web/coi-serviceworker.js" dist/ || true
-          
+                    
           echo ""
           echo "=== Files in dist/ ==="
           ls -la dist/
