@@ -5,6 +5,7 @@
 
 void WalkingState::OnEnter()
 {
+	m_timer = 0.0f;
     m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
@@ -23,9 +24,7 @@ std::unique_ptr<PengoState> WalkingState::HandleInput(float dt)
 void WalkingState::Update(float dt)
 {
     // Animate walking sprite
-    static float timer = 0.0f;
-    timer += dt;
-    int frame = (static_cast<int>(timer * 8.0f) % 2);
-
+    m_timer += dt;
+    int frame = (static_cast<int>(m_timer * 8.0f) % 2);
     m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), frame);
 }
