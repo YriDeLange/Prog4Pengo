@@ -12,12 +12,27 @@ bool dae::InputManager::ProcessInput(float deltaTime)
     if (m_pKeyboardState)
         memcpy(m_PreviousKeyboardState, m_pKeyboardState, SDL_SCANCODE_COUNT * sizeof(bool));
 
+    memset(m_KeyDownThisFrame, 0, sizeof(m_KeyDownThisFrame));
+    memset(m_KeyUpThisFrame, 0, sizeof(m_KeyUpThisFrame));
+
     m_pKeyboardState = SDL_GetKeyboardState(nullptr);
 
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
         if (e.type == SDL_EVENT_QUIT) return false;
+
+        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat)
+        {
+            if (e.key.scancode < SDL_SCANCODE_COUNT)
+                m_KeyDownThisFrame[e.key.scancode] = true;
+        }
+        else if (e.type == SDL_EVENT_KEY_UP)
+        {
+            if (e.key.scancode < SDL_SCANCODE_COUNT)
+                m_KeyUpThisFrame[e.key.scancode] = true;
+        }
+
         ImGui_ImplSDL3_ProcessEvent(&e);
     }
 
@@ -30,9 +45,9 @@ bool dae::InputManager::ProcessInput(float deltaTime)
         bool trigger = false;
         switch (state)
         {
-        case KeyState::Down:    trigger = current && !previous;  break;
-        case KeyState::Up:      trigger = !current && previous; if (trigger) printf("UP fired: scancode %d", scancode); break;
-        case KeyState::Pressed: trigger = current;               break;
+        case KeyState::Down:    trigger = (current && !previous) || m_KeyDownThisFrame[scancode]; break;
+        case KeyState::Up:      trigger = (!current && previous) || m_KeyUpThisFrame[scancode];   break;
+        case KeyState::Pressed: trigger = current;                                                break;
         }
         if (trigger) command->Execute(deltaTime);
     }

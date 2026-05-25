@@ -38,5 +38,8 @@ namespace dae
 
         const bool* m_pKeyboardState{ nullptr };
         bool m_PreviousKeyboardState[SDL_SCANCODE_COUNT]{};
+
+        bool m_KeyDownThisFrame[SDL_SCANCODE_COUNT]{};
+        bool m_KeyUpThisFrame[SDL_SCANCODE_COUNT]{};
     };
 }
