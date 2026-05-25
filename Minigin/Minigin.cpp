@@ -18,14 +18,6 @@
 #include "GameTime.h"
 #include "ServiceLocator.h"
 #include "SoundSystemImpl.h"
-#include "SteamGlobals.h"
-
-#if USE_STEAMWORKS
-#pragma warning (push)
-#pragma warning (disable:4996)
-#include <steam_api.h>
-#pragma warning (pop)
-#endif
 
 SDL_Window* g_window{};
 
@@ -68,11 +60,6 @@ void PrintSDLVersion()
 dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
-
-#if USE_STEAMWORKS
-	if (!SteamAPI_Init())
-		throw std::runtime_error(std::string("Fatal Error - Steam must be running to play this game (SteamAPI_Init() failed)."));
-#endif
 	
 	if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
@@ -90,8 +77,8 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 
 	g_window = SDL_CreateWindow(
 		"Pengo",
-		224,
-		288,
+		224 * 3,
+		288 * 3,
 		SDL_WINDOW_OPENGL
 	);
 	if (g_window == nullptr) 
@@ -106,15 +93,6 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 
 dae::Minigin::~Minigin()
 {
-	#if USE_STEAMWORKS
-		SteamAPI_Shutdown();
-		if (g_SteamAchievements)
-		{
-			delete g_SteamAchievements;
-			g_SteamAchievements = nullptr;
-		}
-	#endif
-
 	ServiceLocator::Shutdown();
 	Renderer::GetInstance().Destroy();
 	SDL_DestroyWindow(g_window);
@@ -151,8 +129,4 @@ void dae::Minigin::RunOneFrame()
 	SceneManager::GetInstance().Update(time.GetDeltaTime());
 
 	Renderer::GetInstance().Render();
-
-	#if USE_STEAMWORKS
-		SteamAPI_RunCallbacks();
-	#endif 
 }

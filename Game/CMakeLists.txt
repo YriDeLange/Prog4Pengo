@@ -62,23 +62,6 @@ if(NOT EMSCRIPTEN AND WIN32)
         endif()
     endforeach()
 
-    # Steam support (if enabled)
-    if(Steamworks_FOUND)
-        if(WIN32 AND DEFINED Steamworks_RUNTIME_DLL)
-            add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${Steamworks_RUNTIME_DLL}"
-                    "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-                COMMENT "Copying steam_api64.dll"
-            )
-        endif()
-
-        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E echo "480" > "$<TARGET_FILE_DIR:${TARGET_NAME}>/steam_appid.txt"
-            COMMENT "Creating steam_appid.txt"
-        )
-    endif()
-
     # Visual Studio settings
     set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${TARGET_NAME})
     set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET_NAME}>")
@@ -110,4 +93,11 @@ if(EMSCRIPTEN)
     )
 
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
+
+# Compiler warnings
+if(MSVC)
+    target_compile_options(Minigin PRIVATE /W4 /WX)
+else()
+    target_compile_options(Minigin PRIVATE -Wall -Wextra -Werror)
 endif()

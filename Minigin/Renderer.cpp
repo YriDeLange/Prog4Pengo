@@ -26,6 +26,8 @@ void dae::Renderer::Init(SDL_Window* window)
 		std::cout << "Failed to create the renderer: " << SDL_GetError() << "\n";
 		throw std::runtime_error(std::string("SDL_CreateRenderer Error: ") + SDL_GetError());
 	}
+	SDL_SetRenderLogicalPresentation(m_renderer, 224, 288,
+		SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImPlot::CreateContext();

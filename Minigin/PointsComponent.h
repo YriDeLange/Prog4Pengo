@@ -2,7 +2,6 @@
 #include "Component.h"
 #include "Subject.h"
 #include "GameEvents.h"
-#include "SteamGlobals.h"
 
 namespace dae
 {
@@ -29,14 +28,6 @@ namespace dae
         {
             m_Points += amount;
             m_Subject.Notify(eventId);
-
-        #if USE_STEAMWORKS
-            if (!m_WinnerAchievementGranted && m_Points >= 500 && g_SteamAchievements)
-            {
-                g_SteamAchievements->SetAchievement("ACH_WIN_ONE_GAME");
-                m_WinnerAchievementGranted = true;
-            }
-        #endif
         }
     };
 }

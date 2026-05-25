@@ -16,8 +16,6 @@ add_library(Minigin STATIC
     SceneManager.cpp
     ServiceLocator.cpp
     SoundSystemImpl.cpp
-    SteamAchievements.cpp
-    SteamGlobals.cpp
     TextComponent.cpp
     Texture2D.cpp
 
@@ -171,10 +169,6 @@ if (WIN32)
     find_package(VLD CONFIG)
 endif()
 
-# Steamworks (if present)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/steam")
-find_package(Steamworks QUIET)
-
 # --------------------- Public interface ---------------------
 target_include_directories(Minigin PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -198,11 +192,6 @@ target_link_libraries(Minigin PUBLIC SDL3_mixer::SDL3_mixer)
 
 if(WIN32)
     target_link_libraries(Minigin PUBLIC xinput)
-endif()
-
-if(Steamworks_FOUND)
-    target_link_libraries(Minigin PUBLIC Steamworks::Steamworks)
-    target_compile_definitions(Minigin PRIVATE USE_STEAMWORKS)
 endif()
 
 # Compiler warnings
