@@ -4,11 +4,6 @@
 
 bool dae::InputManager::ProcessInput(float deltaTime)
 {
-    static int frameCounter = 0;
-    if (++frameCounter % 60 == 0)
-        printf("ProcessInput alive, frame %d, bindings=%zu\n",
-            frameCounter, m_KeyboardCommands.size());
-
     if (m_pKeyboardState)
         memcpy(m_PreviousKeyboardState, m_pKeyboardState, SDL_SCANCODE_COUNT * sizeof(bool));
 

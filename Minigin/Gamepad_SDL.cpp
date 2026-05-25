@@ -17,6 +17,8 @@ class dae::Gamepad::GamepadImpl
         case 0x0002: return SDL_GAMEPAD_BUTTON_DPAD_DOWN;
         case 0x0004: return SDL_GAMEPAD_BUTTON_DPAD_LEFT;
         case 0x0008: return SDL_GAMEPAD_BUTTON_DPAD_RIGHT;
+        case 0x1000: return SDL_GAMEPAD_BUTTON_SOUTH; // A
+        case 0x4000: return SDL_GAMEPAD_BUTTON_WEST;  // X
         default:     return SDL_GAMEPAD_BUTTON_INVALID;
         }
     }

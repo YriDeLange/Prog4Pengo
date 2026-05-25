@@ -84,6 +84,10 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 		std::cerr << "SDL_INIT_AUDIO failed: " << SDL_GetError() << std::endl;
 	}
 
+	if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)) {
+		std::cerr << "SDL_INIT_GAMEPAD failed: " << SDL_GetError() << std::endl;
+	}
+
 	g_window = SDL_CreateWindow(
 		"Pengo",
 		224,
