@@ -30,3 +30,17 @@ dae::Scene& dae::SceneManager::CreateScene()
 	m_scenes.emplace_back(new Scene());
 	return *m_scenes.back();
 }
+
+void dae::SceneManager::RemoveScene(Scene& scene)
+{
+	std::erase_if(m_scenes,
+		[&scene](const std::unique_ptr<Scene>& pScene)
+		{
+			return pScene.get() == &scene;
+		});
+}
+
+void dae::SceneManager::RemoveAllScenes()
+{
+	m_scenes.clear();
+}

@@ -14,11 +14,15 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
     Pengo.cpp
     PengoComponent.cpp
     LevelGrid.cpp
+    LevelLoader.cpp
     IceBlock.cpp
     States/StandingState.cpp
     States/WalkingState.cpp
     States/PushingState.cpp
     States/DyingState.cpp
+    States/MenuState.cpp
+    States/MenuCommands.cpp
+    States/PlayingState.cpp
 )
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)

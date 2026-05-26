@@ -7,9 +7,10 @@
 
 namespace dae
 {
-    IceBlock::IceBlock(GameObject* owner, int gridX, int gridY)
+    IceBlock::IceBlock(GameObject* owner, int gridX, int gridY, BlockType type)
         : Component(owner)
         , m_gridPos(gridX, gridY)
+        , m_type(type)
     {
         auto& grid = LevelGrid::GetInstance();
         grid.RegisterBlock(this, gridX, gridY);
@@ -22,7 +23,7 @@ namespace dae
 
     IceBlock::~IceBlock()
     {
-        
+
     }
 
     void IceBlock::Cleanup()
@@ -43,6 +44,9 @@ namespace dae
     bool IceBlock::TryPush(glm::ivec2 direction)
     {
         if (m_state != State::Idle) return false;
+
+        // Diamond blocks are indestructible and immovable.
+        if (m_type == BlockType::Diamond) return false;
 
         auto& grid = LevelGrid::GetInstance();
         glm::ivec2 next = m_gridPos + direction;

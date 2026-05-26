@@ -13,6 +13,13 @@ namespace dae
 	public:
 		Scene& CreateScene();
 
+		// Destroy a specific scene previously returned by CreateScene().
+		// Safe to call with a scene that isn't tracked (no-op).
+		void RemoveScene(Scene& scene);
+
+		// Destroy all scenes. Useful as a hard reset between states.
+		void RemoveAllScenes();
+
 		void FixedUpdate();
 		void Update(float deltaTime);
 		void Render();

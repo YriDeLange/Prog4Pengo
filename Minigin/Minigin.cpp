@@ -52,15 +52,15 @@ void PrintSDLVersion()
 	// LogSDLVersion("Compiled with SDL_image ",SDL_IMAGE_MAJOR_VERSION, SDL_IMAGE_MINOR_VERSION, SDL_IMAGE_MICRO_VERSION);
 	// version = IMG_Version();
 	// LogSDLVersion("Linked with SDL_image ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
-	LogSDLVersion("Compiled with SDL_ttf ",	SDL_TTF_MAJOR_VERSION, SDL_TTF_MINOR_VERSION,SDL_TTF_MICRO_VERSION);
+	LogSDLVersion("Compiled with SDL_ttf ", SDL_TTF_MAJOR_VERSION, SDL_TTF_MINOR_VERSION, SDL_TTF_MICRO_VERSION);
 	version = TTF_Version();
-	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version),	SDL_VERSIONNUM_MICRO(version));
+	LogSDLVersion("Linked with SDL_ttf ", SDL_VERSIONNUM_MAJOR(version), SDL_VERSIONNUM_MINOR(version), SDL_VERSIONNUM_MICRO(version));
 }
 
 dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 {
 	PrintSDLVersion();
-	
+
 	if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		SDL_Log("Renderer error: %s", SDL_GetError());
@@ -81,7 +81,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 		288 * 3,
 		SDL_WINDOW_OPENGL
 	);
-	if (g_window == nullptr) 
+	if (g_window == nullptr)
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
@@ -117,6 +117,12 @@ void dae::Minigin::RunOneFrame()
 	time.Update();
 
 	m_quit = !InputManager::GetInstance().ProcessInput(time.GetDeltaTime());
+
+	// Application state machine: apply any pending state transition for this
+	// frame (Menu -> Playing -> GameOver -> ...). Done before scene updates so
+	// a state's OnEnter/OnExit (which build/tear down scenes) take effect this
+	// frame.
+	m_stateMachine.Update(time.GetDeltaTime());
 
 	// Fixed update: catch up in fixed steps (physics / networking)
 	while (time.ShouldFixedUpdate())
