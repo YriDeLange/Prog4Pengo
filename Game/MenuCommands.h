@@ -5,7 +5,6 @@ class MenuState;
 
 namespace dae
 {
-    // Moves the menu selection by a fixed delta (e.g. -1 up, +1 down).
     class MenuNavigateCommand final : public Command
     {
         MenuState* m_pMenu;
@@ -17,7 +16,6 @@ namespace dae
         void Execute(float deltaTime) override;
     };
 
-    // Confirms the current selection.
     class MenuConfirmCommand final : public Command
     {
         MenuState* m_pMenu;

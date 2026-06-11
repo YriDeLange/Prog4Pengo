@@ -1,6 +1,10 @@
 #include "DyingState.h"
 #include "../Pengo.h"
 #include "StandingState.h"
+#include "../SnoBeeRegistry.h"
+#include "../SnoBeeComponent.h"
+#include "ServiceLocator.h"
+#include "SoundSystem.h"
 
 void DyingState::OnEnter()
 {
@@ -12,9 +16,13 @@ void DyingState::OnEnter()
 void DyingState::OnExit()
 {
     m_pPengo->UnlockMovement();
+    m_pPengo->ResetToSpawn();
+    for (auto* bee : dae::SnoBeeRegistry::GetInstance().GetAll())
+        bee->ResetToSpawn();
+    dae::ServiceLocator::GetSoundSystem().ResumeMusic();
 }
 
-std::unique_ptr<PengoState> DyingState::HandleInput(float dt)
+std::unique_ptr<PengoState> DyingState::HandleInput(float /*dt*/)
 {
     if (m_timer >= 3.0f)
         return std::make_unique<StandingState>(m_pPengo);

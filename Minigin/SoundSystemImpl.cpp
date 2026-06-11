@@ -3,6 +3,7 @@
 #include <SDL3_mixer/SDL_mixer.h>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 #ifndef __EMSCRIPTEN__
 #include <queue>
@@ -25,9 +26,14 @@ namespace dae {
         std::unordered_map<sound_id, MIX_Audio*> m_loadedSounds;
         std::vector<MIX_Track*> m_tracks;
 
+        MIX_Track* m_musicTrack = nullptr;
+        sound_id   m_currentMusicId{ static_cast<sound_id>(-1) };
+        bool       m_musicStarted{ false };
+        bool       m_muted{ false };
+
 #ifndef __EMSCRIPTEN__
         std::queue<SoundRequest> m_requestQueue;
-        std::mutex m_mutex;
+        mutable std::mutex m_mutex;
         std::condition_variable m_cv;
         std::thread m_thread;
         bool m_running{ true };
@@ -56,6 +62,12 @@ namespace dae {
                     m_pImpl->m_tracks.push_back(track);
                 }
             }
+
+            // Dedicated music track, separate from the effect pool.
+            m_pImpl->m_musicTrack = MIX_CreateTrack(m_pImpl->m_mixer);
+            if (m_pImpl->m_musicTrack == nullptr) {
+                std::cerr << "MIX_CreateTrack (music) failed: " << SDL_GetError() << std::endl;
+            }
         }
 
 #ifndef __EMSCRIPTEN__
@@ -74,7 +86,11 @@ namespace dae {
         if (m_pImpl->m_thread.joinable()) m_pImpl->m_thread.join();
 #endif
 
-        // Clean up tracks first
+        if (m_pImpl->m_musicTrack) {
+            MIX_DestroyTrack(m_pImpl->m_musicTrack);
+            m_pImpl->m_musicTrack = nullptr;
+        }
+
         for (auto track : m_pImpl->m_tracks) {
             if (track) {
                 MIX_DestroyTrack(track);
@@ -114,6 +130,87 @@ namespace dae {
         }
         m_pImpl->m_loadedSounds[id] = audio;
     }
+
+    // ---------------- Music ----------------
+
+    void SoundSystemImpl::PlayMusic(sound_id id, float volume)
+    {
+        if (!m_pImpl->m_musicTrack) return;
+
+        MIX_Audio* audio = nullptr;
+        {
+#ifndef __EMSCRIPTEN__
+            std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
+#endif
+            // Idempotent: same song already started -> leave it playing.
+            if (m_pImpl->m_musicStarted && m_pImpl->m_currentMusicId == id
+                && MIX_TrackPlaying(m_pImpl->m_musicTrack))
+                return;
+
+            auto it = m_pImpl->m_loadedSounds.find(id);
+            if (it == m_pImpl->m_loadedSounds.end()) return;
+            audio = it->second;
+
+            m_pImpl->m_currentMusicId = id;
+            m_pImpl->m_musicStarted = true;
+        }
+
+        MIX_SetTrackAudio(m_pImpl->m_musicTrack, audio);
+        MIX_SetTrackGain(m_pImpl->m_musicTrack, volume);
+
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, -1); // infinite loop
+        MIX_PlayTrack(m_pImpl->m_musicTrack, props);
+        SDL_DestroyProperties(props);
+    }
+
+    void SoundSystemImpl::PauseMusic()
+    {
+        if (m_pImpl->m_musicTrack)
+            MIX_PauseTrack(m_pImpl->m_musicTrack);
+    }
+
+    void SoundSystemImpl::ResumeMusic()
+    {
+        if (m_pImpl->m_musicTrack)
+            MIX_ResumeTrack(m_pImpl->m_musicTrack);
+    }
+
+    void SoundSystemImpl::StopMusic()
+    {
+        if (m_pImpl->m_musicTrack)
+        {
+            MIX_StopTrack(m_pImpl->m_musicTrack, 0);
+#ifndef __EMSCRIPTEN__
+            std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
+#endif
+            m_pImpl->m_musicStarted = false;
+        }
+    }
+
+    // ---------------- Mute ----------------
+
+    void SoundSystemImpl::SetMuted(bool muted)
+    {
+        {
+#ifndef __EMSCRIPTEN__
+            std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
+#endif
+            m_pImpl->m_muted = muted;
+        }
+        if (m_pImpl->m_mixer)
+            MIX_SetMixerGain(m_pImpl->m_mixer, muted ? 0.0f : 1.0f);
+    }
+
+    bool SoundSystemImpl::IsMuted() const
+    {
+#ifndef __EMSCRIPTEN__
+        std::lock_guard<std::mutex> lock(m_pImpl->m_mutex);
+#endif
+        return m_pImpl->m_muted;
+    }
+
+    // ---------------- Effects ----------------
 
 #ifdef __EMSCRIPTEN__
     void SoundSystemImpl::Play(sound_id id, float volume)

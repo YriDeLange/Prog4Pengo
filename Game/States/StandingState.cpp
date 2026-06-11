@@ -10,7 +10,7 @@ void StandingState::OnEnter()
     m_pPengo->SetSpriteFrame(m_pPengo->GetDirection(), 0);
 }
 
-std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
+std::unique_ptr<PengoState> StandingState::HandleInput(float /*dt*/)
 {
     if (m_pPengo->IsPushing())
         return std::make_unique<PushingState>(m_pPengo);
@@ -22,7 +22,7 @@ std::unique_ptr<PengoState> StandingState::HandleInput(float dt)
     return nullptr;
 }
 
-void StandingState::Update(float dt)
+void StandingState::Update(float /*dt*/)
 {
     
 }

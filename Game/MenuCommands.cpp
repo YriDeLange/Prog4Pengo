@@ -1,5 +1,5 @@
 #include "MenuCommands.h"
-#include "MenuState.h"
+#include "States/MenuState.h"
 
 namespace dae
 {

@@ -33,7 +33,7 @@ public:
     void MoveLeft();
     void MoveRight();
     void StopMoving();
-    void TryPush(); // push the block in the current facing direction
+    void TryPush();
 
     void SetDirection(PengoDirection dir);
     PengoDirection GetDirection() const { return m_direction; }
@@ -52,6 +52,9 @@ public:
     void LockMovement();
     void UnlockMovement() { m_movementLocked = false; }
 
+    bool IsDying() const { return m_movementLocked; }
+    void ResetToSpawn();
+
     dae::GameObject* GetOwner() const { return m_owner; }
 
 private:
@@ -66,10 +69,12 @@ private:
     glm::vec2 m_velocity{ 0.0f, 0.0f };
     glm::vec2 m_inputDirection{ 0.0f, 0.0f };
     static constexpr float MOVE_SPEED = 150.0f;
+    static constexpr float STUN_DURATION = 4.5f;
     bool IsPlayer1{};
 
     glm::ivec2 m_currentGridPos{ 0, 0 };
     glm::ivec2 m_targetGridPos{ 0, 0 };
+    glm::ivec2 m_spawnGridPos{ 0, 0 };
     bool m_isMovingToTarget = false;
 
     bool m_isPushing = false;

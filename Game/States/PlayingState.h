@@ -1,10 +1,12 @@
 #pragma once
 #include "GameState.h"
 #include "GameMode.h"
-#include "InputManager.h"   // for dae::KeyState
+#include "InputManager.h"
 #include "Gamepad.h"
 #include <memory>
+#include <glm/glm.hpp>
 #include <vector>
+#include <array>
 #include <utility>
 #include <tuple>
 #include <SDL3/SDL.h>
@@ -13,16 +15,28 @@ namespace dae
 {
     class Scene;
     class GameObject;
+    class SnoBeeCounterComponent;
+    class SnoBeeComponent;
 }
 
-// The actual gameplay state. Built with the mode chosen in the menu; OnEnter
-// loads the level file, builds the HUD, spawns players according to the mode,
-// and binds gameplay input. OnExit unbinds everything it bound and destroys
-// its scene, so no command outlives the GameObject it points at.
+#include "GameOverState.h"
+
+struct PlayerCarry
+{
+    int lives{ 4 };
+    int points{ 0 };
+};
+
 class PlayingState final : public dae::GameState
 {
 public:
-    explicit PlayingState(GameMode mode) : m_mode(mode) {}
+    static constexpr int FIRST_LEVEL = 1;
+    static constexpr int LAST_LEVEL = 3;
+
+    explicit PlayingState(GameMode mode,
+        int levelIndex = FIRST_LEVEL,
+        std::array<PlayerCarry, 2> carry = {})
+        : m_mode(mode), m_levelIndex(levelIndex), m_carry(carry) {}
 
     void OnEnter() override;
     void OnExit() override;
@@ -31,20 +45,50 @@ public:
 
 private:
     GameMode    m_mode;
+    int         m_levelIndex;
+    std::array<PlayerCarry, 2> m_carry;
+
     dae::Scene* m_pScene{ nullptr };
 
-    // Spawns a fully-wired Pengo (health, points, render) plus its HUD label,
-    // lives display and score display. isPlayer1 selects the sprite sheet.
-    // Returns the raw GameObject* for input binding.
+    dae::SnoBeeCounterComponent* m_pBeeCounter{ nullptr };
+    int   m_initialBeeCount{ 0 };
+    float m_hatchCooldown{ 0.f };
+    struct PendingHatch { glm::ivec2 gridPos; float timer; };
+    std::vector<PendingHatch> m_pendingHatches;
+
+    dae::SnoBeeComponent* m_pControlledBee{ nullptr };
+    glm::vec2 m_lastControlledPos{ 0.f, 0.f };
+    void UpdatePossession();
+    void BindSnoBeeGamepad(unsigned int controllerIdx);
+
+    bool  m_beesSpawned{ false };
+    bool  m_skipRequested{ false };
+    float m_roundTimer{ 0.f };
+    float m_winTimer{ -1.f };
+    float m_loseTimer{ -1.f };
+
+    static constexpr float WIN_DELAY = 1.5f;
+    static constexpr float LOSE_DELAY = 3.f;
+
     dae::GameObject* SpawnPlayer(int gridX, int gridY, bool isPlayer1,
+        const PlayerCarry& carry,
         const char* labelText, float labelX, float livesX, float scoreX);
 
-    // Input binding helpers. Each records what it bound so OnExit can undo it.
+    std::unique_ptr<dae::GameState> NextLevel();
+    std::array<PlayerCarry, 2> HarvestCarry() const;
+    std::vector<PlayerResult> BuildResults() const;
+
+    int  CountIdleEggs() const;
+    void UpdateEggs(float deltaTime);
+
+    bool m_diamondBonusAwarded{ false };
+    void CheckDiamondAlignment();
+
     void BindKeyboardForPlayer(dae::GameObject* player);
     void BindGamepadForPlayer(unsigned int controllerIdx, dae::GameObject* player);
+    void BindLevelHotkeys();
     void UnbindAll();
 
-    // Track exactly what we bound, to unbind precisely in OnExit.
     std::vector<std::pair<SDL_Scancode, dae::KeyState>> m_boundKeys;
     std::vector<std::tuple<unsigned int, dae::Gamepad::Button, dae::KeyState>> m_boundButtons;
 };

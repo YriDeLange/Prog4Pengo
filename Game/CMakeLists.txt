@@ -13,16 +13,19 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
     Main.cpp
     Pengo.cpp
     PengoComponent.cpp
+    SnoBeeComponent.cpp
     LevelGrid.cpp
     LevelLoader.cpp
     IceBlock.cpp
+    HighScores.cpp
+    MenuCommands.cpp
     States/StandingState.cpp
     States/WalkingState.cpp
     States/PushingState.cpp
     States/DyingState.cpp
     States/MenuState.cpp
-    States/MenuCommands.cpp
     States/PlayingState.cpp
+    States/GameOverState.cpp
 )
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -101,7 +104,7 @@ endif()
 
 # Compiler warnings
 if(MSVC)
-    target_compile_options(Minigin PRIVATE /W4 /WX)
+    target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 else()
-    target_compile_options(Minigin PRIVATE -Wall -Wextra -Werror)
+    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Werror)
 endif()

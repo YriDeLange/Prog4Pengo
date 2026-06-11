@@ -6,15 +6,17 @@
 #include "States/DyingState.h"
 #include "LevelGrid.h"
 #include "IceBlock.h"
+#include "SnoBeeRegistry.h"
+#include "SnoBeeComponent.h"
 
 Pengo::Pengo(dae::GameObject* owner, bool IsPlayer1)
     : m_owner(owner)
     , IsPlayer1(IsPlayer1)
 {
-    // Sync grid position from the world position set before this component was added
     glm::vec3 worldPos = m_owner->GetLocalPosition();
     m_currentGridPos = dae::LevelGrid::GetInstance().WorldToGrid(worldPos.x, worldPos.y);
     m_targetGridPos = m_currentGridPos;
+    m_spawnGridPos = m_currentGridPos;
 
     m_currentState = std::make_unique<StandingState>(this);
     m_currentState->OnEnter();
@@ -66,7 +68,7 @@ void Pengo::Update(float dt)
     UpdateGridMovement(dt);
 }
 
-// ====================== INPUT METHODS (for Command pattern) ======================
+// ====================== INPUT METHODS ======================
 void Pengo::MoveUp()
 {
     if (m_isMovingToTarget || m_isPushing || m_movementLocked) return;
@@ -112,11 +114,32 @@ void Pengo::TryPush()
     case PengoDirection::Right: front.x += 1; break;
     }
 
-    auto* block = dae::LevelGrid::GetInstance().GetBlockAt(front.x, front.y);
+    auto& grid = dae::LevelGrid::GetInstance();
+
+    if (!grid.IsInBounds(front.x, front.y))
+    {
+        for (auto* bee : dae::SnoBeeRegistry::GetInstance().GetAll())
+        {
+            const glm::ivec2 b = bee->GetGridPos();
+            const bool onWall =
+                (front.x < 0 && b.x == 0) ||
+                (front.x >= grid.GetWidth() && b.x == grid.GetWidth() - 1) ||
+                (front.y < 0 && b.y == 0) ||
+                (front.y >= grid.GetHeight() && b.y == grid.GetHeight() - 1);
+            if (onWall)
+                bee->Stun(STUN_DURATION);
+        }
+
+        m_isPushing = true;
+        m_pushedBlock = nullptr;
+        return;
+    }
+
+    auto* block = grid.GetBlockAt(front.x, front.y);
     if (!block) return;
 
     glm::ivec2 pushDir = front - m_currentGridPos;
-    m_isPushing = block->TryPush(pushDir);
+    m_isPushing = block->TryPush(pushDir, m_owner);
     m_pushedBlock = m_isPushing ? block : nullptr;
 }
 
@@ -132,9 +155,19 @@ void Pengo::LockMovement()
     m_isMovingToTarget = false;
     m_inputDirection = { 0.0f, 0.0f };
     m_velocity = { 0.0f, 0.0f };
-    // Snap to the committed grid position to avoid being stuck mid-cell
     glm::vec2 snapped = dae::LevelGrid::GetInstance().GridToWorld(m_currentGridPos.x, m_currentGridPos.y);
     m_owner->SetLocalPosition(snapped.x, snapped.y, 0.0f);
+}
+
+void Pengo::ResetToSpawn()
+{
+    m_currentGridPos = m_spawnGridPos;
+    m_targetGridPos = m_spawnGridPos;
+    m_isMovingToTarget = false;
+    m_inputDirection = { 0.0f, 0.0f };
+    m_velocity = { 0.0f, 0.0f };
+    glm::vec2 world = dae::LevelGrid::GetInstance().GridToWorld(m_spawnGridPos.x, m_spawnGridPos.y);
+    m_owner->SetLocalPosition(world.x, world.y, 0.0f);
 }
 
 // ====================== SPRITESHEET ======================
@@ -244,7 +277,6 @@ void Pengo::UpdateGridMovement(float dt)
     glm::vec2 direction = targetWorldPos - glm::vec2(currentPos.x, currentPos.y);
     float distance = glm::length(direction);
 
-    // Close enough? Snap to exact position
     if (distance < 2.0f)
     {
         m_owner->SetLocalPosition(targetWorldPos.x, targetWorldPos.y, 0.0f);
@@ -254,7 +286,6 @@ void Pengo::UpdateGridMovement(float dt)
         return;
     }
 
-    // Move towards target
     glm::vec2 normalizedDir = glm::normalize(direction);
     m_velocity = normalizedDir * MOVE_SPEED;
 

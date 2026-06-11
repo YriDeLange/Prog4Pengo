@@ -9,6 +9,12 @@
 #include "GameStateMachine.h"
 #include "States/MenuState.h"
 
+#include "InputManager.h"
+#include "ServiceLocator.h"
+#include "SoundSystem.h"
+#include "FunctionCommand.h"
+#include "Sounds.h"
+
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -28,13 +34,23 @@ int main(int, char* [])
 
 	dae::Minigin engine(data_location);
 
-	// Initialise the application by setting the first state. Everything that
-	// used to live in load() (level loading, player spawning, input bindings)
-	// now lives inside the concrete states, starting from the menu.
 	engine.Run([&engine]()
 		{
 			engine.GetStateMachine().SetState(std::make_unique<MenuState>());
-		});
+			auto& sound = dae::ServiceLocator::GetSoundSystem();
+#if __EMSCRIPTEN__
+			sound.LoadSound(Sounds::MainMusic, "/Data/MainBGM.mp3");
+#else
+			sound.LoadSound(Sounds::MainMusic, "Data/MainBGM.mp3");
+#endif
+			sound.PlayMusic(Sounds::MainMusic, 0.5f);
 
+			dae::InputManager::GetInstance().BindKeyboardCommand(SDL_SCANCODE_F2, dae::KeyState::Down,
+				std::make_unique<dae::FunctionCommand>([] {
+					dae::ServiceLocator::GetSoundSystem().ToggleMute();
+					}));
+
+			
+		});
 	return 0;
 }

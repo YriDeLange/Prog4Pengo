@@ -13,7 +13,7 @@ void PushingState::OnExit()
     m_pPengo->ClearPushState();
 }
 
-std::unique_ptr<PengoState> PushingState::HandleInput(float dt)
+std::unique_ptr<PengoState> PushingState::HandleInput(float /*dt*/)
 {
     if (m_timer >= PUSH_DURATION)
         return std::make_unique<StandingState>(m_pPengo);

@@ -19,15 +19,12 @@ namespace dae
 
         void Execute(float deltaTime) override
         {
-            // Check if this GameObject has a PengoComponent
             auto* pengoComp = GetGameObject()->GetComponent<PengoComponent>();
             if (pengoComp)
             {
-                // Use Pengo's movement system
                 auto* pengo = pengoComp->GetPengo();
                 if (pengo)
                 {
-                    // Set direction based on input
                     if (m_Direction.y < 0)      pengo->MoveUp();
                     else if (m_Direction.y > 0) pengo->MoveDown();
                     else if (m_Direction.x < 0) pengo->MoveLeft();
@@ -36,7 +33,6 @@ namespace dae
             }
             else
             {
-                // Original behavior for non-Pengo objects
                 auto pos = GetGameObject()->GetLocalPosition();
                 pos += glm::vec3(m_Direction * m_Speed * deltaTime, 0.f);
                 GetGameObject()->SetLocalPosition(pos);
@@ -51,7 +47,7 @@ namespace dae
             : GameObjectCommand(pGO) {
         }
 
-        void Execute(float deltaTime) override
+        void Execute(float /*deltaTime*/) override
         {
             auto* pengoComp = GetGameObject()->GetComponent<PengoComponent>();
             if (pengoComp)

@@ -1,5 +1,5 @@
 #include "MenuState.h"
-#include "MenuCommands.h"
+#include "../MenuCommands.h"
 #include "PlayingState.h"
 
 #include "SceneManager.h"
@@ -15,13 +15,12 @@
 
 namespace
 {
-    // Logical screen is 224x288. Center column for text is ~x=112.
     constexpr float LOGO_X = 32.f;
     constexpr float LOGO_Y = 40.f;
 
     constexpr float OPTION_X = 32.f;
-    constexpr float OPTION_Y0 = 160.f; // first option
-    constexpr float OPTION_STEP = 28.f;  // vertical spacing
+    constexpr float OPTION_Y0 = 160.f;
+    constexpr float OPTION_STEP = 28.f;
 
     const char* OPTION_LABELS[3] = { "SINGLE PLAYER", "CO-OP", "VERSUS" };
 }

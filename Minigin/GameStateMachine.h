@@ -4,8 +4,6 @@
 
 namespace dae
 {
-    // Owns the active GameState and drives its lifecycle. Transitions are applied
-    // between Update calls so a state can safely request its own replacement.
     class GameStateMachine final
     {
     public:
@@ -21,7 +19,6 @@ namespace dae
         GameStateMachine& operator=(const GameStateMachine&) = delete;
         GameStateMachine& operator=(GameStateMachine&&) = delete;
 
-        // Set the initial state (calls its OnEnter).
         void SetState(std::unique_ptr<GameState> state)
         {
             if (m_pCurrent)
@@ -38,7 +35,6 @@ namespace dae
             if (!m_pCurrent)
                 return;
 
-            // Capture the request first; only swap once Update has fully returned.
             std::unique_ptr<GameState> next = m_pCurrent->Update(deltaTime);
             if (next)
             {

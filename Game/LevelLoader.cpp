@@ -26,16 +26,13 @@ namespace dae
         if (!file.is_open())
         {
             std::cerr << "LevelLoader: failed to open '" << filePath << "'\n";
-            return data; // loaded == false
+            return data;
         }
 
-        // Read up to GRID_HEIGHT non-empty lines. We tolerate trailing
-        // whitespace / short rows: TileAt() treats out-of-range as empty.
         std::vector<std::string> rows;
         std::string line;
         while (rows.size() < static_cast<size_t>(GRID_HEIGHT) && std::getline(file, line))
         {
-            // Strip a trailing carriage return (Windows line endings on *nix).
             if (!line.empty() && line.back() == '\r')
                 line.pop_back();
             rows.push_back(line);
@@ -47,9 +44,6 @@ namespace dae
             return data;
         }
 
-        // (Re)initialise the grid to the fixed Pengo dimensions. Offsets match
-        // the values previously hardcoded in Main.cpp (8px left border,
-        // 41px top = 34 HUD + 7 border).
         auto& grid = LevelGrid::GetInstance();
         grid.Init(GRID_WIDTH, GRID_HEIGHT, 16, 8.f, 41.f);
 
@@ -81,13 +75,8 @@ namespace dae
                 case 'S':
                     data.snoBeeSpawns.push_back({ x, y });
                     break;
-                case '#':
-                    data.wallTiles.push_back({ x, y });
-                    break;
                 case '.':
                 default:
-                    // Empty or unknown character -> nothing. Unknown chars are
-                    // tolerated so a typo in a level file can't crash loading.
                     break;
                 }
             }
