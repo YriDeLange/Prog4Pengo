@@ -61,7 +61,6 @@ private:
     dae::GameObject* m_owner = nullptr;
     std::unique_ptr<PengoState> m_currentState;
     PengoDirection m_direction = PengoDirection::Down;
-    int m_currentFrame = 0;
     static constexpr int FRAME_WIDTH = 16;
     static constexpr int FRAME_HEIGHT = 16;
     static constexpr const char* SPRITESHEET = "Pengo_Spritesheet.png";

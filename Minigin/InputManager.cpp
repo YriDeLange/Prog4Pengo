@@ -1,5 +1,4 @@
 #include "InputManager.h"
-#include <backends/imgui_impl_sdl3.h>
 #include <cstring>
 
 bool dae::InputManager::ProcessInput(float deltaTime)
@@ -28,7 +27,6 @@ bool dae::InputManager::ProcessInput(float deltaTime)
                 m_KeyUpThisFrame[e.key.scancode] = true;
         }
 
-        ImGui_ImplSDL3_ProcessEvent(&e);
     }
 
     for (auto& [binding, command] : m_KeyboardCommands)
