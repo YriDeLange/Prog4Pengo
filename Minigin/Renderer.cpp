@@ -24,11 +24,6 @@ void dae::Renderer::Init(SDL_Window* window)
 	}
 	SDL_SetRenderLogicalPresentation(m_renderer, 224, 288,
 		SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
-#if __EMSCRIPTEN__
-	// For an Emscripten build we are disabling file-system access, so let's not attempt to do a fopen() of the imgui.ini file.
-	// You may manually call LoadIniSettingsFromMemory() to load settings from your own storage.
-	io.IniFilename = NULL;
-#endif
 }
 
 void dae::Renderer::Render() const
