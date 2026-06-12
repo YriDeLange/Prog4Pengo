@@ -21,8 +21,8 @@ policy (what a Sno-Bee is, what a level file means, what the scoring rules are).
 ### Component model & game objects
 `GameObject` owns a vector of `Component`s (Update/FixedUpdate/Render/RenderUI) and
 supports parent/child hierarchies with lazy world-position evaluation (dirty flag
-propagated to children). Everything visible or behavioural in the game — Pengo, Sno-Bees,
-ice blocks, HUD widgets — is a GameObject composed from components.
+propagated to children). Everything visible or behavioural in the game (Pengo, Sno-Bees,
+ice blocks, HUD widgets) is a GameObject composed from components.
 
 ### Game loop & timing
 `Minigin::RunOneFrame` runs the classic loop: input → application state machine →
@@ -108,4 +108,3 @@ keyboard/gamepad 1 vs. gamepad 0).
 CMake ≥ 3.26 with the provided presets (Visual Studio 2022+, Ninja). Dependencies
 (SDL3, SDL3_ttf, SDL3_mixer, glm, ImGui/ImPlot) are fetched automatically via
 FetchContent. All targets build at warning level 4 with warnings as errors.
-The `Data/` folder is copied next to the executable post-build.
