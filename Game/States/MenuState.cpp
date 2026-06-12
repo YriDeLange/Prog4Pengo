@@ -131,12 +131,15 @@ void MenuState::BindInput()
     input.BindKeyboardCommand(SDL_SCANCODE_SPACE, dae::KeyState::Down,
         std::make_unique<dae::MenuConfirmCommand>(this));
 
-    input.BindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Down,
-        std::make_unique<dae::MenuNavigateCommand>(this, -1));
-    input.BindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Down,
-        std::make_unique<dae::MenuNavigateCommand>(this, +1));
-    input.BindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Down,
-        std::make_unique<dae::MenuConfirmCommand>(this));
+    for (unsigned int idx : { 0u, 1u })
+    {
+        input.BindControllerCommand(idx, dae::Gamepad::Button::DpadUp, dae::KeyState::Down,
+            std::make_unique<dae::MenuNavigateCommand>(this, -1));
+        input.BindControllerCommand(idx, dae::Gamepad::Button::DpadDown, dae::KeyState::Down,
+            std::make_unique<dae::MenuNavigateCommand>(this, +1));
+        input.BindControllerCommand(idx, dae::Gamepad::Button::A, dae::KeyState::Down,
+            std::make_unique<dae::MenuConfirmCommand>(this));
+    }
 }
 
 void MenuState::UnbindInput()
@@ -150,7 +153,10 @@ void MenuState::UnbindInput()
     input.UnbindKeyboardCommand(SDL_SCANCODE_RETURN, dae::KeyState::Down);
     input.UnbindKeyboardCommand(SDL_SCANCODE_SPACE, dae::KeyState::Down);
 
-    input.UnbindControllerCommand(0, dae::Gamepad::Button::DpadUp, dae::KeyState::Down);
-    input.UnbindControllerCommand(0, dae::Gamepad::Button::DpadDown, dae::KeyState::Down);
-    input.UnbindControllerCommand(0, dae::Gamepad::Button::A, dae::KeyState::Down);
+    for (unsigned int idx : { 0u, 1u })
+    {
+        input.UnbindControllerCommand(idx, dae::Gamepad::Button::DpadUp, dae::KeyState::Down);
+        input.UnbindControllerCommand(idx, dae::Gamepad::Button::DpadDown, dae::KeyState::Down);
+        input.UnbindControllerCommand(idx, dae::Gamepad::Button::A, dae::KeyState::Down);
+    }
 }
