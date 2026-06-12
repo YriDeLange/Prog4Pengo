@@ -106,5 +106,5 @@ keyboard/gamepad 1 vs. gamepad 0).
 ## Building
 
 CMake ≥ 3.26 with the provided presets (Visual Studio 2022+, Ninja). Dependencies
-(SDL3, SDL3_ttf, SDL3_mixer, glm, ImGui/ImPlot) are fetched automatically via
+(SDL3, SDL3_ttf, SDL3_mixer, glm) are fetched automatically via
 FetchContent. All targets build at warning level 4 with warnings as errors.

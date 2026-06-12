@@ -137,7 +137,6 @@ target_include_directories(Minigin PUBLIC
     ${glm_SOURCE_DIR}
     ${sdl3_SOURCE_DIR}/include
     ${sdl3_ttf_SOURCE_DIR}/include
-    ${imgui_SOURCE_DIR}
     ${VLD_INCLUDE_DIR}
 )
 

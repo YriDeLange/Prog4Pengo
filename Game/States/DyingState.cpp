@@ -11,6 +11,7 @@ void DyingState::OnEnter()
     m_pPengo->LockMovement();
     m_timer = 0.0f;
     m_pPengo->SetDeathFrame(0);
+    dae::ServiceLocator::GetSoundSystem().PauseMusic();
 }
 
 void DyingState::OnExit()
