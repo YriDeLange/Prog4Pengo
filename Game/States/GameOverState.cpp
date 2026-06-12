@@ -239,9 +239,9 @@ void GameOverState::BindInput()
             input.BindKeyboardCommand(key, dae::KeyState::Down,
                 std::make_unique<FunctionCommand>(fn));
         };
-    auto bindBtn = [&](dae::Gamepad::Button btn, auto fn)
+    auto bindBtn = [&](unsigned int idx, dae::Gamepad::Button btn, auto fn)
         {
-            input.BindControllerCommand(0, btn, dae::KeyState::Down,
+            input.BindControllerCommand(idx, btn, dae::KeyState::Down,
                 std::make_unique<FunctionCommand>(fn));
         };
 
@@ -256,11 +256,14 @@ void GameOverState::BindInput()
     bindKey(SDL_SCANCODE_RETURN, [this] { Confirm(); });
     bindKey(SDL_SCANCODE_SPACE, [this] { Confirm(); });
 
-    bindBtn(dae::Gamepad::Button::DpadUp, [this] { CycleLetter(+1); });
-    bindBtn(dae::Gamepad::Button::DpadDown, [this] { CycleLetter(-1); });
-    bindBtn(dae::Gamepad::Button::DpadLeft, [this] { MoveSlot(-1); });
-    bindBtn(dae::Gamepad::Button::DpadRight, [this] { MoveSlot(+1); });
-    bindBtn(dae::Gamepad::Button::A, [this] { Confirm(); });
+    for (unsigned int idx : { 0u, 1u })
+    {
+        bindBtn(idx, dae::Gamepad::Button::DpadUp, [this] { CycleLetter(+1); });
+        bindBtn(idx, dae::Gamepad::Button::DpadDown, [this] { CycleLetter(-1); });
+        bindBtn(idx, dae::Gamepad::Button::DpadLeft, [this] { MoveSlot(-1); });
+        bindBtn(idx, dae::Gamepad::Button::DpadRight, [this] { MoveSlot(+1); });
+        bindBtn(idx, dae::Gamepad::Button::A, [this] { Confirm(); });
+    }
 }
 
 void GameOverState::UnbindInput()
@@ -272,8 +275,9 @@ void GameOverState::UnbindInput()
                       SDL_SCANCODE_RETURN, SDL_SCANCODE_SPACE })
         input.UnbindKeyboardCommand(key, dae::KeyState::Down);
 
-    for (auto btn : { dae::Gamepad::Button::DpadUp, dae::Gamepad::Button::DpadDown,
-                      dae::Gamepad::Button::DpadLeft, dae::Gamepad::Button::DpadRight,
-                      dae::Gamepad::Button::A })
-        input.UnbindControllerCommand(0, btn, dae::KeyState::Down);
+    for (unsigned int idx : { 0u, 1u })
+        for (auto btn : { dae::Gamepad::Button::DpadUp, dae::Gamepad::Button::DpadDown,
+                          dae::Gamepad::Button::DpadLeft, dae::Gamepad::Button::DpadRight,
+                          dae::Gamepad::Button::A })
+            input.UnbindControllerCommand(idx, btn, dae::KeyState::Down);
 }
